@@ -16,10 +16,7 @@ function TaskPanel({
 
   // Licznik czasu sesji
   useEffect(() => {
-    if (!sessionStartTime) {
-      setElapsedTime(0);
-      return;
-    }
+    if (!sessionStartTime) return;
 
     const interval = setInterval(() => {
       const now = new Date();
@@ -30,6 +27,8 @@ function TaskPanel({
     return () => clearInterval(interval);
   }, [sessionStartTime]);
 
+  const elapsedTimeForDisplay = sessionStartTime ? elapsedTime : 0;
+
   return (
     <aside className="task-panel">
       <div className="panel-icon">{task.icon}</div>
@@ -38,15 +37,15 @@ function TaskPanel({
 
       <div className="timer-display">
         <div className="timer-section">
-          <div className="timer-value">{formatDuration(elapsedTime)}</div>
+          <div className="timer-value">{formatDuration(elapsedTimeForDisplay)}</div>
           <div className="timer-label">Czas sesji</div>
         </div>
         <div className="timer-section">
-          <div className="timer-value-small">{formatDuration(dailyTotalSavedForTask + elapsedTime)}</div>
+          <div className="timer-value-small">{formatDuration(dailyTotalSavedForTask + elapsedTimeForDisplay)}</div>
           <div className="timer-label">Ten task dzisiaj</div>
         </div>
         <div className="timer-section">
-          <div className="timer-value-small">{formatDuration(dailyTotalSaved + elapsedTime)}</div>
+          <div className="timer-value-small">{formatDuration(dailyTotalSaved + elapsedTimeForDisplay)}</div>
           <div className="timer-label">Dzisiaj razem</div>
         </div>
       </div>
