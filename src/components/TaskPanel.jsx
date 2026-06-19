@@ -1,11 +1,31 @@
+import { useEffect, useState } from "react";
+import { formatDuration } from "../utils/sessionTracker";
+
 function TaskPanel({
   task,
   finishTask,
   toggleSubtask,
   showSubWheel,
   setShowSubWheel,
+  sessionStartTime,
+  dailyTotalSaved,
+  dailyTotalSavedForTask,
 }) {
+  const [elapsedTime, setElapsedTime] = useState(0);
   const completedSubtasks = task.subtasks.filter((subtask) => subtask.done).length;
+
+  // Licznik czasu sesji
+  useEffect(() => {
+    if (!sessionStartTime) return;
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const elapsed = Math.max(0, Math.floor((now - sessionStartTime) / 1000));
+      setElapsedTime(elapsed);
+    }, 1000); // aktualizuj co sekundę
+
+    return () => clearInterval(interval);
+  }, [sessionStartTime]);
 
   return (
     <aside className="task-panel">
@@ -13,8 +33,22 @@ function TaskPanel({
 
       <h2>{task.title}</h2>
 
+      <div className="timer-display">
+        <div className="timer-section">
+          <div className="timer-value">{formatDuration(elapsedTime)}</div>
+          <div className="timer-label">Czas sesji</div>
+        </div>
+        <div className="timer-section">
+          <div className="timer-value-small">{formatDuration(dailyTotalSavedForTask + elapsedTime)}</div>
+          <div className="timer-label">Ten task dzisiaj</div>
+        </div>
+        <div className="timer-section">
+          <div className="timer-value-small">{formatDuration(dailyTotalSaved + elapsedTime)}</div>
+          <div className="timer-label">Dzisiaj razem</div>
+        </div>
+      </div>
+
       <div className="meta">
-        <span>⏱️ 30 min</span>
         <span>🔁 Codziennie</span>
       </div>
 

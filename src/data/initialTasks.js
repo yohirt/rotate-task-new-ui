@@ -12,6 +12,7 @@ export const initialTasks = [
       { id: 3, title: "Zrób kanapki / posiłek", done: false },
       { id: 4, title: "Sprzątnij kuchnię", done: false },
     ],
+    sessions: [],
   },
   {
     id: 2,
@@ -26,6 +27,7 @@ export const initialTasks = [
       { id: 3, title: "BrukBand", done: false },
       { id: 4, title: "Werbel", done: false },
     ],
+    sessions: [],
   },
   {
     id: 3,
@@ -39,6 +41,7 @@ export const initialTasks = [
       { id: 2, title: "Ćwiczenia główne", done: false },
       { id: 3, title: "Rozciąganie", done: false },
     ],
+    sessions: [],
   },
   {
     id: 4,
@@ -52,6 +55,7 @@ export const initialTasks = [
       { id: 2, title: "Zrób najważniejsze zadanie", done: false },
       { id: 3, title: "Zapisz postęp", done: false },
     ],
+    sessions: [],
   },
   {
     id: 5,
@@ -61,6 +65,7 @@ export const initialTasks = [
     description: "Odpoczynek i posiłek.",
     done: false,
     subtasks: [],
+    sessions: [],
   },
   {
     id: 6,
@@ -74,6 +79,7 @@ export const initialTasks = [
       { id: 2, title: "Przerób materiał", done: false },
       { id: 3, title: "Zrób notatkę", done: false },
     ],
+    sessions: [],
   },
   {
     id: 7,
@@ -83,5 +89,6 @@ export const initialTasks = [
     description: "Zakończenie dnia i chwila odpoczynku.",
     done: false,
     subtasks: [],
+    sessions: [],
   },
 ];
