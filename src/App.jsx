@@ -761,12 +761,30 @@ function App() {
         </header>
 
         <nav className="top-menu" aria-label="Główne">
-          <button className="active">🏠 Dzisiaj</button>
-          <button>🔁 Moje cykle</button>
-          <button>📅 Kalendarz</button>
-          <button>📊 Statystyki</button>
-          <button>🕘 Historia</button>
-          <button>⚙️ Ustawienia</button>
+          <button className="active">
+            <span className="nav-icon" aria-hidden="true">🏠</span>
+            <span className="nav-label">Dzisiaj</span>
+          </button>
+          <button>
+            <span className="nav-icon" aria-hidden="true">🔁</span>
+            <span className="nav-label">Moje cykle</span>
+          </button>
+          <button>
+            <span className="nav-icon" aria-hidden="true">📅</span>
+            <span className="nav-label">Kalendarz</span>
+          </button>
+          <button>
+            <span className="nav-icon" aria-hidden="true">📊</span>
+            <span className="nav-label">Statystyki</span>
+          </button>
+          <button>
+            <span className="nav-icon" aria-hidden="true">🕘</span>
+            <span className="nav-label">Historia</span>
+          </button>
+          <button>
+            <span className="nav-icon" aria-hidden="true">⚙️</span>
+            <span className="nav-label">Ustawienia</span>
+          </button>
         </nav>
 
         {installNotice && (
