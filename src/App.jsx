@@ -479,6 +479,44 @@ function App() {
     );
   }
 
+  function updateTask(taskId, updates) {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId
+          ? {
+              ...task,
+              ...updates,
+              targetMinutes: Math.max(0, Number(updates.targetMinutes) || 0),
+            }
+          : task
+      )
+    );
+  }
+
+  function updateSubtask(taskId, subtaskId, updates) {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => {
+        if (task.id !== taskId) return task;
+
+        return {
+          ...task,
+          subtasks: task.subtasks.map((subtask) =>
+            subtask.id === subtaskId
+              ? {
+                  ...subtask,
+                  ...updates,
+                  targetMinutes: Math.max(
+                    0,
+                    Number(updates.targetMinutes) || 0
+                  ),
+                }
+              : subtask
+          ),
+        };
+      })
+    );
+  }
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -576,9 +614,12 @@ function App() {
 
           {activeTask ? (
             <TaskPanel
+              key={activeTask.id}
               task={activeTask}
               finishTask={finishTask}
               hideTask={hideTask}
+              updateTask={updateTask}
+              updateSubtask={updateSubtask}
               toggleSubtask={toggleSubtask}
               activateSubtask={activateSubtask}
               showSubWheel={showSubWheel}

@@ -50,12 +50,9 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex, taskProgressById = {} }
               onClick={() => setActiveIndex(index)}
             >
               <span className="wheel-item-fill" aria-hidden="true"></span>
-              <span className="task-number">
-                {String(index + 1).padStart(2, "0")}
-              </span>
+              <strong>{task.title}</strong>
               <span className="task-percent">{progress.percent}%</span>
               <span className="task-icon">{task.icon}</span>
-              <strong>{task.title}</strong>
               <span className="task-time-progress">
                 {formatDuration(progress.spentSeconds)} /{" "}
                 {formatDuration(progress.targetSeconds)}

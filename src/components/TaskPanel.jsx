@@ -1,9 +1,41 @@
+import { useState } from "react";
 import { formatDuration } from "../utils/sessionTracker";
+
+const ICON_OPTIONS = [
+  "\u{1F4DA}",
+  "\u{1F9F9}",
+  "\u{1F941}",
+  "\u{1F3C3}",
+  "\u{1F4BB}",
+  "\u{1F374}",
+  "\u{1F4D6}",
+  "\u{1F33F}",
+  "\u{1F9E0}",
+  "\u{1F3AF}",
+  "\u{1F6E0}\uFE0F",
+  "\u{1F9D8}",
+  "\u{1F4DD}",
+  "\u2728",
+];
+
+const getTaskFormState = (task) => ({
+  title: task.title,
+  icon: task.icon,
+  targetMinutes: String(task.targetMinutes ?? 0),
+  description: task.description,
+});
+
+const getSubtaskFormState = (subtask) => ({
+  title: subtask.title,
+  targetMinutes: String(subtask.targetMinutes ?? 0),
+});
 
 function TaskPanel({
   task,
   finishTask,
   hideTask,
+  updateTask,
+  updateSubtask,
   toggleSubtask,
   activateSubtask,
   showSubWheel,
@@ -16,17 +48,141 @@ function TaskPanel({
   activeSubtaskId,
   subtaskProgressById = {},
 }) {
+  const [isEditingTask, setIsEditingTask] = useState(false);
+  const [editingSubtaskId, setEditingSubtaskId] = useState(null);
+  const [taskForm, setTaskForm] = useState(() => getTaskFormState(task));
+  const [subtaskForm, setSubtaskForm] = useState(null);
   const completedSubtasks = task.subtasks.filter((subtask) => subtask.done).length;
   const elapsedTimeForDisplay = sessionStartTime ? elapsedTime : 0;
   const targetSeconds = taskProgress?.targetSeconds ?? 0;
   const spentSeconds = taskProgress?.spentSeconds ?? 0;
   const progressPercent = taskProgress?.percent ?? 0;
 
+  const updateTaskFormField = (field, value) => {
+    setTaskForm((currentForm) => ({ ...currentForm, [field]: value }));
+  };
+
+  const startSubtaskEdit = (subtask) => {
+    setEditingSubtaskId(subtask.id);
+    setSubtaskForm(getSubtaskFormState(subtask));
+  };
+
+  const toggleTaskEdit = () => {
+    if (isEditingTask) {
+      setIsEditingTask(false);
+      return;
+    }
+
+    setTaskForm(getTaskFormState(task));
+    setIsEditingTask(true);
+  };
+
+  const submitTaskEdit = (event) => {
+    event.preventDefault();
+
+    updateTask(task.id, {
+      title: taskForm.title.trim() || task.title,
+      icon: taskForm.icon.trim() || task.icon,
+      targetMinutes: taskForm.targetMinutes,
+      description: taskForm.description.trim(),
+    });
+    setIsEditingTask(false);
+  };
+
+  const submitSubtaskEdit = (event, subtask) => {
+    event.preventDefault();
+
+    updateSubtask(task.id, subtask.id, {
+      title: subtaskForm.title.trim() || subtask.title,
+      targetMinutes: subtaskForm.targetMinutes,
+    });
+    setEditingSubtaskId(null);
+    setSubtaskForm(null);
+  };
+
   return (
     <aside className="task-panel">
-      <div className="panel-icon">{task.icon}</div>
+      <div className="panel-topline">
+        <div className="panel-icon">{task.icon}</div>
+        <button
+          type="button"
+          className="icon-button"
+          onClick={toggleTaskEdit}
+          aria-label={isEditingTask ? "Zamknij edycje taska" : "Edytuj task"}
+          title={isEditingTask ? "Zamknij edycje taska" : "Edytuj task"}
+        >
+          {isEditingTask ? "\u00D7" : "\u270E"}
+        </button>
+      </div>
 
-      <h2>{task.title}</h2>
+      {isEditingTask ? (
+        <form className="edit-form task-edit-form" onSubmit={submitTaskEdit}>
+          <label>
+            <span>Nazwa taska</span>
+            <input
+              value={taskForm.title}
+              onChange={(event) => updateTaskFormField("title", event.target.value)}
+            />
+          </label>
+
+          <label>
+            <span>Ikona</span>
+            <input
+              className="icon-input"
+              value={taskForm.icon}
+              onChange={(event) => updateTaskFormField("icon", event.target.value)}
+              aria-label="Ikona taska"
+            />
+          </label>
+
+          <div className="icon-picker" aria-label="Szybki wybor ikony">
+            {ICON_OPTIONS.map((icon) => (
+              <button
+                key={icon}
+                type="button"
+                className={taskForm.icon === icon ? "selected" : ""}
+                onClick={() => updateTaskFormField("icon", icon)}
+                aria-label={`Uzyj ikony ${icon}`}
+              >
+                {icon}
+              </button>
+            ))}
+          </div>
+
+          <label>
+            <span>Cel w minutach</span>
+            <input
+              type="number"
+              min="0"
+              step="5"
+              value={taskForm.targetMinutes}
+              onChange={(event) =>
+                updateTaskFormField("targetMinutes", event.target.value)
+              }
+            />
+          </label>
+
+          <label>
+            <span>Opis</span>
+            <textarea
+              rows="3"
+              value={taskForm.description}
+              onChange={(event) =>
+                updateTaskFormField("description", event.target.value)
+              }
+            />
+          </label>
+
+          <div className="edit-actions">
+            <button type="button" onClick={() => setIsEditingTask(false)}>
+              Anuluj
+            </button>
+            <button type="submit">Zapisz</button>
+          </div>
+        </form>
+      ) : (
+        <h2>{task.title}</h2>
+      )}
 
       <div className="task-goal">
         <div>
@@ -61,7 +217,7 @@ function TaskPanel({
       </div>
 
       <div className="meta">
-        <span>🔁 Codziennie</span>
+        <span>{"\u{1F501}"} Codziennie</span>
       </div>
 
       <p className="description">{task.description}</p>
@@ -89,38 +245,97 @@ function TaskPanel({
                 key={subtask.id}
                 className={activeSubtaskId === subtask.id ? "active-subtask" : ""}
               >
-                <button
-                  type="button"
-                  className={subtask.done ? "checked" : ""}
-                  onClick={() => toggleSubtask(subtask.id)}
-                  aria-label={
-                    subtask.done
-                      ? `Oznacz "${subtask.title}" jako niewykonane`
-                      : `Oznacz "${subtask.title}" jako wykonane`
-                  }
-                >
-                  {subtask.done ? "✓" : ""}
-                </button>
+                {editingSubtaskId === subtask.id ? (
+                  <form
+                    className="edit-form subtask-edit-form"
+                    onSubmit={(event) => submitSubtaskEdit(event, subtask)}
+                  >
+                    <label>
+                      <span>Nazwa podzadania</span>
+                      <input
+                        value={subtaskForm.title}
+                        onChange={(event) =>
+                          setSubtaskForm((currentForm) => ({
+                            ...currentForm,
+                            title: event.target.value,
+                          }))
+                        }
+                      />
+                    </label>
+                    <label>
+                      <span>Cel w minutach</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="5"
+                        value={subtaskForm.targetMinutes}
+                        onChange={(event) =>
+                          setSubtaskForm((currentForm) => ({
+                            ...currentForm,
+                            targetMinutes: event.target.value,
+                          }))
+                        }
+                      />
+                    </label>
+                    <div className="edit-actions">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingSubtaskId(null);
+                          setSubtaskForm(null);
+                        }}
+                      >
+                        Anuluj
+                      </button>
+                      <button type="submit">Zapisz</button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className={subtask.done ? "checked" : ""}
+                      onClick={() => toggleSubtask(subtask.id)}
+                      aria-label={
+                        subtask.done
+                          ? `Oznacz "${subtask.title}" jako niewykonane`
+                          : `Oznacz "${subtask.title}" jako wykonane`
+                      }
+                    >
+                      {subtask.done ? "\u2713" : ""}
+                    </button>
 
-                <button
-                  type="button"
-                  className="subtask-progress-button"
-                  onClick={() => activateSubtask(subtask.id)}
-                >
-                  <span className="subtask-title-row">
-                    <span className={subtask.done ? "done-text" : ""}>
-                      {subtask.title}
-                    </span>
-                    <strong>{progress.percent}%</strong>
-                  </span>
-                  <span className="subtask-time-row">
-                    {formatDuration(progress.spentSeconds)} /{" "}
-                    {formatDuration(progress.targetSeconds)}
-                  </span>
-                  <span className="subtask-progress-bar">
-                    <span style={{ width: `${progress.percent}%` }}></span>
-                  </span>
-                </button>
+                    <button
+                      type="button"
+                      className="subtask-progress-button"
+                      onClick={() => activateSubtask(subtask.id)}
+                    >
+                      <span className="subtask-title-row">
+                        <span className={subtask.done ? "done-text" : ""}>
+                          {subtask.title}
+                        </span>
+                        <strong>{progress.percent}%</strong>
+                      </span>
+                      <span className="subtask-time-row">
+                        {formatDuration(progress.spentSeconds)} /{" "}
+                        {formatDuration(progress.targetSeconds)}
+                      </span>
+                      <span className="subtask-progress-bar">
+                        <span style={{ width: `${progress.percent}%` }}></span>
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="icon-button subtask-edit-button"
+                      onClick={() => startSubtaskEdit(subtask)}
+                      aria-label={`Edytuj podzadanie ${subtask.title}`}
+                      title="Edytuj podzadanie"
+                    >
+                      {"\u270E"}
+                    </button>
+                  </>
+                )}
               </li>
             );
           })}
@@ -143,7 +358,7 @@ function TaskPanel({
         </button>
 
         <button className="primary" onClick={finishTask}>
-          ✓ Zatrzymaj zadanie
+          {"\u2713"} Zatrzymaj zadanie
         </button>
       </div>
     </aside>
