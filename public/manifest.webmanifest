@@ -1,6 +1,7 @@
 {
   "name": "Rotate",
   "short_name": "Rotate",
+  "id": ".",
   "description": "Codzienna rutyna, zadania i statystyki w jednej instalowalnej aplikacji.",
   "start_url": ".",
   "scope": ".",

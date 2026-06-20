@@ -38,6 +38,17 @@ const formatHeaderDate = (date) =>
     month: "long",
   });
 
+const INSTALL_PROMPT_READY_EVENT = "rotate:install-prompt-ready";
+let pendingInstallPrompt = null;
+
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    pendingInstallPrompt = event;
+    window.dispatchEvent(new Event(INSTALL_PROMPT_READY_EVENT));
+  });
+}
+
 const emptyTaskForm = {
   title: "",
   icon: "\u{1F3AF}",
@@ -59,7 +70,7 @@ const createTaskFromForm = (form, nextId) => ({
 });
 
 function App() {
-  const [installPrompt, setInstallPrompt] = useState(null);
+  const [installPrompt, setInstallPrompt] = useState(() => pendingInstallPrompt);
   const [installNotice, setInstallNotice] = useState("");
   const [isInstalled, setIsInstalled] = useState(() => {
     if (typeof window === "undefined") {
@@ -169,23 +180,29 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (event) => {
-      event.preventDefault();
-      setInstallPrompt(event);
+    const handleInstallPromptReady = () => {
+      setInstallPrompt(pendingInstallPrompt);
       setInstallNotice("");
     };
 
     const handleAppInstalled = () => {
+      pendingInstallPrompt = null;
       setInstallPrompt(null);
       setIsInstalled(true);
       setInstallNotice("Aplikacja została zainstalowana.");
     };
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener(
+      INSTALL_PROMPT_READY_EVENT,
+      handleInstallPromptReady
+    );
     window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener(
+        INSTALL_PROMPT_READY_EVENT,
+        handleInstallPromptReady
+      );
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
@@ -198,6 +215,7 @@ function App() {
     if (installPrompt) {
       installPrompt.prompt();
       const choice = await installPrompt.userChoice;
+      pendingInstallPrompt = null;
       setInstallPrompt(null);
 
       setInstallNotice(
