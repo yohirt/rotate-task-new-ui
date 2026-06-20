@@ -137,7 +137,8 @@ button {
 }
 
 .top-menu {
-  display: flex;
+  display: none;
+  /* display: flex; */
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 28px;
