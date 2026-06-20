@@ -66,7 +66,6 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex, taskProgressById = {} }
       </div>
 
       <div className="wheel-center">
-        <small>AKTUALNE ZADANIE</small>
         <h1>{tasks[activeIndex].title}</h1>
         <p>{taskProgressById[tasks[activeIndex].id]?.percent ?? 0}% celu</p>
       </div>
