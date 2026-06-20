@@ -16,6 +16,19 @@ export const initialTasks = [
     sessions: [],
   },
   {
+    id: 1,
+    title: "Sprzątanie",
+    icon: "🧹",
+    time: "",
+    targetMinutes: 30,
+    description: "Sprzątanie domu i utrzymanie porządku.",
+    done: false,
+    subtasks: [
+      { id: 1, title: "Układanie", targetMinutes: 10, done: false },
+    ],
+    sessions: [],
+  },
+  {
     id: 2,
     title: "Drums",
     icon: "🥁",
