@@ -23,7 +23,7 @@ function TaskWheel({ tasks, activeIndex, setActiveIndex }) {
                 index === activeIndex ? "active" : ""
               } ${task.done ? "done" : ""}`}
               style={{
-                transform: `rotate(${angle}deg) translate(0, -135px) rotate(${-angle + activeIndex * angleStep}deg)`,
+                transform: `rotate(${angle}deg) translate(0, -155px) rotate(${-angle + activeIndex * angleStep}deg)`,
               }}
               onClick={() => setActiveIndex(index)}
             >

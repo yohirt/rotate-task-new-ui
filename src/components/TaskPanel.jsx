@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { formatDuration } from "../utils/sessionTracker";
+import { calculateElapsedSeconds, formatDuration } from "../utils/sessionTracker";
 
 function TaskPanel({
   task,
@@ -11,20 +11,33 @@ function TaskPanel({
   dailyTotalSaved,
   dailyTotalSavedForTask,
 }) {
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(() =>
+    calculateElapsedSeconds(sessionStartTime)
+  );
   const completedSubtasks = task.subtasks.filter((subtask) => subtask.done).length;
 
-  // Licznik czasu sesji
   useEffect(() => {
-    if (!sessionStartTime) return;
+    if (!sessionStartTime) {
+      return;
+    }
 
-    const interval = setInterval(() => {
-      const now = new Date();
-      const elapsed = Math.max(0, Math.floor((now - sessionStartTime) / 1000));
-      setElapsedTime(elapsed);
-    }, 1000); // aktualizuj co sekundę
+    const updateElapsedTime = () => {
+      setElapsedTime(calculateElapsedSeconds(sessionStartTime));
+    };
 
-    return () => clearInterval(interval);
+    const initialUpdate = setTimeout(updateElapsedTime, 0);
+    const interval = setInterval(updateElapsedTime, 1000);
+    window.addEventListener("focus", updateElapsedTime);
+    window.addEventListener("pageshow", updateElapsedTime);
+    document.addEventListener("visibilitychange", updateElapsedTime);
+
+    return () => {
+      clearTimeout(initialUpdate);
+      clearInterval(interval);
+      window.removeEventListener("focus", updateElapsedTime);
+      window.removeEventListener("pageshow", updateElapsedTime);
+      document.removeEventListener("visibilitychange", updateElapsedTime);
+    };
   }, [sessionStartTime]);
 
   const elapsedTimeForDisplay = sessionStartTime ? elapsedTime : 0;
@@ -41,11 +54,15 @@ function TaskPanel({
           <div className="timer-label">Czas sesji</div>
         </div>
         <div className="timer-section">
-          <div className="timer-value-small">{formatDuration(dailyTotalSavedForTask + elapsedTimeForDisplay)}</div>
+          <div className="timer-value-small">
+            {formatDuration(dailyTotalSavedForTask + elapsedTimeForDisplay)}
+          </div>
           <div className="timer-label">Ten task dzisiaj</div>
         </div>
         <div className="timer-section">
-          <div className="timer-value-small">{formatDuration(dailyTotalSaved + elapsedTimeForDisplay)}</div>
+          <div className="timer-value-small">
+            {formatDuration(dailyTotalSaved + elapsedTimeForDisplay)}
+          </div>
           <div className="timer-label">Dzisiaj razem</div>
         </div>
       </div>
@@ -95,7 +112,7 @@ function TaskPanel({
         </button>
 
         <button className="primary" onClick={finishTask}>
-          ✓ Zakończ zadanie
+          ✓ Zatrzymaj zadanie
         </button>
       </div>
     </aside>

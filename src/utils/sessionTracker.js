@@ -21,6 +21,11 @@ export const calculateDuration = (startTime, endTime) => {
   return Math.max(0, Math.floor((endTime - startTime) / 1000));
 };
 
+export const calculateElapsedSeconds = (startTime, now = new Date()) => {
+  if (!startTime) return 0;
+  return calculateDuration(new Date(startTime), now);
+};
+
 /**
  * Tworzy nową sesję
  * @param {Date} startTime - czas rozpoczęcia
