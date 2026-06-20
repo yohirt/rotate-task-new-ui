@@ -9,14 +9,14 @@ export const initialTasks = [
     done: false,
     subtasks: [
       { id: 1, title: "Ocena AI", targetMinutes: 30, done: false },
-      { id: 1, title: "Wydrukuj materiały", targetMinutes: 15, done: false },
-      { id: 2, title: "Przygotowanie AI", targetMinutes: 30, done: false },
-      { id: 3, title: "Czytanie", targetMinutes: 75, done: false },
+      { id: 2, title: "Wydrukuj materiały", targetMinutes: 15, done: false },
+      { id: 3, title: "Przygotowanie AI", targetMinutes: 30, done: false },
+      { id: 4, title: "Czytanie", targetMinutes: 75, done: false },
     ],
     sessions: [],
   },
   {
-    id: 1,
+    id: 2,
     title: "Sprzątanie",
     icon: "🧹",
     time: "",
@@ -29,7 +29,7 @@ export const initialTasks = [
     sessions: [],
   },
   {
-    id: 2,
+    id: 3,
     title: "Drums",
     icon: "🥁",
     time: "20:30 - 22:00",
@@ -45,7 +45,7 @@ export const initialTasks = [
     sessions: [],
   },
   {
-    id: 3,
+    id: 4,
     title: "Trening",
     icon: "🏃",
     time: "08:30 - 09:00",
@@ -61,7 +61,7 @@ export const initialTasks = [
     sessions: [],
   },
   {
-    id: 4,
+    id: 5,
     title: "Praca projektowa",
     icon: "💻",
     time: "09:30 - 12:00",
@@ -76,7 +76,7 @@ export const initialTasks = [
     sessions: [],
   },
   {
-    id: 5,
+    id: 6,
     title: "Przerwa na lunch",
     icon: "🍴",
     time: "13:00 - 13:30",
@@ -87,7 +87,7 @@ export const initialTasks = [
     sessions: [],
   },
   {
-    id: 6,
+    id: 7,
     title: "Nauka",
     icon: "📖",
     time: "15:00 - 16:00",
@@ -102,7 +102,7 @@ export const initialTasks = [
     sessions: [],
   },
   {
-    id: 7,
+    id: 8,
     title: "Wieczorny relaks",
     icon: "🌿",
     time: "20:00 - 21:00",

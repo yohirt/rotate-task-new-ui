@@ -36,7 +36,8 @@ function App() {
 
     const isStoredSessionValid = storedRunningSession
       ? initialTasksState.some(
-          (task) => task.id === storedRunningSession.taskId && !task.done
+          (task) =>
+            task.id === storedRunningSession.taskId && !task.done && !task.hidden
         )
       : false;
 
@@ -55,14 +56,15 @@ function App() {
         }
       : null;
 
+    const visibleInitialTasks = initialTasksState.filter((task) => !task.hidden);
     const resolvedActiveIndex = resolvedRunningSession
-      ? initialTasksState.findIndex(
+      ? visibleInitialTasks.findIndex(
           (task) => task.id === resolvedRunningSession.taskId && !task.done
         )
-      : initialTasksState.findIndex((task) => !task.done);
+      : visibleInitialTasks.findIndex((task) => !task.done);
 
     const safeActiveIndex = resolvedActiveIndex >= 0 ? resolvedActiveIndex : 0;
-    const defaultTask = initialTasksState[safeActiveIndex];
+    const defaultTask = visibleInitialTasks[safeActiveIndex];
 
     const createdRunningSession =
       resolvedRunningSession || (defaultTask && !defaultTask.done
@@ -161,8 +163,10 @@ function App() {
     setSessionStartTime(startedAt);
   };
 
-  const activeTask = tasks[activeIndex] ?? null;
-  const completedTasks = tasks.filter((task) => task.done).length;
+  const visibleTasks = tasks.filter((task) => !task.hidden);
+  const hiddenTasks = tasks.filter((task) => task.hidden);
+  const activeTask = visibleTasks[activeIndex] ?? null;
+  const completedTasks = visibleTasks.filter((task) => task.done).length;
 
   // Łączny czas zapisanych sesji z całego dnia (wszystkie taski)
   const today = getLocalDateKey(new Date());
@@ -186,7 +190,7 @@ function App() {
   };
 
   const taskProgressById = Object.fromEntries(
-    tasks.map((task) => [task.id, getTaskProgress(task)])
+    visibleTasks.map((task) => [task.id, getTaskProgress(task)])
   );
   const subtaskProgressById = activeTask
     ? Object.fromEntries(
@@ -211,22 +215,22 @@ function App() {
       )
     : {};
 
-  const totalTargetSeconds = tasks.reduce(
+  const totalTargetSeconds = visibleTasks.reduce(
     (sum, task) => sum + getTargetSeconds(task),
     0
   );
-  const totalProgressSeconds = tasks.reduce((sum, task) => {
+  const totalProgressSeconds = visibleTasks.reduce((sum, task) => {
     const taskProgress = taskProgressById[task.id];
     return sum + Math.min(taskProgress.spentSeconds, taskProgress.targetSeconds);
   }, 0);
   const progress =
     totalTargetSeconds > 0
       ? getTimeProgressPercent(totalProgressSeconds, totalTargetSeconds)
-      : tasks.length > 0
-        ? Math.round((completedTasks / tasks.length) * 100)
+      : visibleTasks.length > 0
+        ? Math.round((completedTasks / visibleTasks.length) * 100)
         : 0;
 
-  const dailyTotalSaved = tasks.reduce(
+  const dailyTotalSaved = visibleTasks.reduce(
     (sum, task) => sum + getDailyDuration(task, today),
     0
   );
@@ -235,7 +239,11 @@ function App() {
     : 0;
 
   const selectTask = (nextIndex) => {
-    if (nextIndex === activeIndex || nextIndex < 0 || nextIndex >= tasks.length) {
+    if (
+      nextIndex === activeIndex ||
+      nextIndex < 0 ||
+      nextIndex >= visibleTasks.length
+    ) {
       return;
     }
 
@@ -246,7 +254,7 @@ function App() {
 
     setActiveIndex(nextIndex);
 
-    const nextTask = tasks[nextIndex];
+    const nextTask = visibleTasks[nextIndex];
     if (nextTask && !nextTask.done) {
       startRunningSessionForTask(nextTask.id, now);
     }
@@ -273,6 +281,54 @@ function App() {
     }
   }
 
+  function hideTask(taskId) {
+    const taskToHide = tasks.find((task) => task.id === taskId);
+    if (!taskToHide) {
+      return;
+    }
+
+    const now = new Date();
+    if (runningSession?.taskId === taskId) {
+      stopRunningSession(now);
+      setSessionStartTime(null);
+    }
+
+    const visibleAfterHide = visibleTasks.filter((task) => task.id !== taskId);
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, hidden: true } : task
+      )
+    );
+    setShowSubWheel(false);
+    const nextActiveIndex =
+      visibleAfterHide.length > 0
+        ? Math.min(activeIndex, visibleAfterHide.length - 1)
+        : 0;
+    setActiveIndex(nextActiveIndex);
+
+    const nextTask = visibleAfterHide[nextActiveIndex];
+    if (runningSession?.taskId === taskId && nextTask && !nextTask.done) {
+      startRunningSessionForTask(nextTask.id, now);
+    }
+  }
+
+  function restoreTask(taskId) {
+    const hadVisibleTasks = visibleTasks.length > 0;
+    const taskToRestore = tasks.find((task) => task.id === taskId);
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, hidden: false } : task
+      )
+    );
+
+    if (!hadVisibleTasks && taskToRestore && !taskToRestore.done) {
+      setActiveIndex(0);
+      startRunningSessionForTask(taskToRestore.id, new Date());
+    }
+  }
+
   function finishTask() {
     if (!activeTask) {
       return;
@@ -286,8 +342,8 @@ function App() {
     setSessionStartTime(null);
 
     setTasks((prevTasks) =>
-      prevTasks.map((task, index) =>
-        index === activeIndex ? { ...task, done: true } : task
+      prevTasks.map((task) =>
+        task.id === activeTask.id ? { ...task, done: true } : task
       )
     );
 
@@ -295,7 +351,7 @@ function App() {
 
     setActiveIndex((prevIndex) => {
       const nextIndex = prevIndex + 1;
-      const normalizedIndex = nextIndex >= tasks.length ? 0 : nextIndex;
+      const normalizedIndex = nextIndex >= visibleTasks.length ? 0 : nextIndex;
       return normalizedIndex;
     });
   }
@@ -306,8 +362,8 @@ function App() {
     }
 
     setTasks((prevTasks) =>
-      prevTasks.map((task, index) => {
-        if (index !== activeIndex) return task;
+      prevTasks.map((task) => {
+        if (task.id !== activeTask.id) return task;
 
         return {
           ...task,
@@ -364,7 +420,7 @@ function App() {
         <section className="content">
           <div className="wheel-area">
             <TaskWheel
-              tasks={tasks}
+              tasks={visibleTasks}
               activeIndex={activeIndex}
               setActiveIndex={selectTask}
               taskProgressById={taskProgressById}
@@ -383,6 +439,21 @@ function App() {
               <small>
                 {completedTasks} z {tasks.length} zadań wykonane
               </small>
+
+              {hiddenTasks.length > 0 && (
+                <div className="hidden-task-list">
+                  <span>Ukryte</span>
+                  {hiddenTasks.map((task) => (
+                    <button
+                      key={task.id}
+                      type="button"
+                      onClick={() => restoreTask(task.id)}
+                    >
+                      {task.icon} {task.title}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -390,6 +461,7 @@ function App() {
             <TaskPanel
               task={activeTask}
               finishTask={finishTask}
+              hideTask={hideTask}
               toggleSubtask={toggleSubtask}
               activateSubtask={activateSubtask}
               showSubWheel={showSubWheel}

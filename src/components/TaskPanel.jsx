@@ -3,6 +3,7 @@ import { formatDuration } from "../utils/sessionTracker";
 function TaskPanel({
   task,
   finishTask,
+  hideTask,
   toggleSubtask,
   activateSubtask,
   showSubWheel,
@@ -129,6 +130,10 @@ function TaskPanel({
       )}
 
       <div className="panel-actions">
+        <button className="secondary" onClick={() => hideTask(task.id)}>
+          Ukryj task
+        </button>
+
         <button
           className="secondary"
           onClick={() => setShowSubWheel(!showSubWheel)}
