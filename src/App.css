@@ -134,6 +134,30 @@ button {
   cursor: pointer;
 }
 
+.topbar-actions .install-button {
+  min-height: 38px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #635bff, #2dd4bf);
+  color: white;
+  font-size: 14px;
+  font-weight: 850;
+  padding: 8px 14px;
+  box-shadow: 0 10px 24px rgba(99, 91, 255, 0.22);
+  white-space: nowrap;
+}
+
+.install-notice {
+  margin: -12px 0 18px;
+  border: 1px solid #c7d2fe;
+  border-radius: 14px;
+  background: #eef2ff;
+  color: #312e81;
+  font-size: 14px;
+  font-weight: 750;
+  padding: 12px 14px;
+  text-align: left;
+}
+
 .content {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
@@ -859,8 +883,19 @@ button {
 
   .topbar-actions {
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 10px;
     font-size: 14px;
+  }
+
+  .topbar-actions .install-button {
+    order: 3;
+    width: 100%;
+  }
+
+  .install-notice {
+    margin: -4px 0 14px;
+    font-size: 13px;
   }
 
   .content {

@@ -39,6 +39,18 @@ const formatHeaderDate = (date) =>
   });
 
 function App() {
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [installNotice, setInstallNotice] = useState("");
+  const [isInstalled, setIsInstalled] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true
+    );
+  });
   const [bootstrap] = useState(() => {
     const initialTasksState = loadTasks(initialTasks);
     const storedRunningSession = loadRunningSession();
@@ -133,6 +145,53 @@ function App() {
       document.removeEventListener("visibilitychange", updateCurrentTime);
     };
   }, []);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event) => {
+      event.preventDefault();
+      setInstallPrompt(event);
+      setInstallNotice("");
+    };
+
+    const handleAppInstalled = () => {
+      setInstallPrompt(null);
+      setIsInstalled(true);
+      setInstallNotice("Aplikacja została zainstalowana.");
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
+  }, []);
+
+  const installApp = async () => {
+    const isIos =
+      /iphone|ipad|ipod/i.test(window.navigator.userAgent) &&
+      !window.navigator.standalone;
+
+    if (installPrompt) {
+      installPrompt.prompt();
+      const choice = await installPrompt.userChoice;
+      setInstallPrompt(null);
+
+      setInstallNotice(
+        choice.outcome === "accepted"
+          ? "Instalacja rozpoczęta."
+          : "Instalacja anulowana."
+      );
+      return;
+    }
+
+    setInstallNotice(
+      isIos
+        ? "Na iPhone: Udostępnij -> Dodaj do ekranu początkowego."
+        : "Otwórz menu przeglądarki i wybierz Zainstaluj aplikację albo Dodaj do ekranu."
+    );
+  };
 
   const stopRunningSession = (endedAt) => {
     if (!runningSession) {
@@ -456,10 +515,24 @@ function App() {
           <div className="topbar-actions">
             <span>📅 {headerDate}</span>
             <span>📅 Środa, 22 maja</span>
+            {!isInstalled && (
+              <button
+                className="install-button"
+                type="button"
+                onClick={installApp}
+              >
+                Instaluj
+              </button>
+            )}
             <button>🔔</button>
             <button>⋮</button>
           </div>
         </header>
+        {installNotice && (
+          <div className="install-notice" role="status">
+            {installNotice}
+          </div>
+        )}
 
         <section className="content">
           <div className="wheel-area">
