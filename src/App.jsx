@@ -4,6 +4,7 @@ import StatsPanel from "./components/StatsPanel";
 import TaskWheel from "./components/TaskWheel";
 import SubtaskWheel from "./components/SubtaskWheel";
 import { initialTasks } from "./data/initialTasks";
+import { getTaskColor } from "./utils/taskColors";
 import {
   loadTasks,
   saveTasks,
@@ -21,6 +22,7 @@ import {
   getDailySubtaskDuration,
   getTargetSeconds,
   getTimeProgressPercent,
+  formatDuration,
 } from "./utils/sessionTracker";
 import "./App.css";
 
@@ -395,13 +397,6 @@ function App() {
         ? getTimeProgressPercent(totalProgressSeconds, totalTargetSeconds)
         : 0,
   };
-  const progress =
-    totalTargetSeconds > 0
-      ? getTimeProgressPercent(totalProgressSeconds, totalTargetSeconds)
-      : visibleTasks.length > 0
-        ? Math.round((completedTasks / visibleTasks.length) * 100)
-        : 0;
-
   const dailyTotalSaved = visibleTasks.reduce(
     (sum, task) => sum + getDailyDuration(task, today),
     0
@@ -802,19 +797,50 @@ function App() {
               taskProgressById={taskProgressById}
             />
 
-            <div className="progress-card">
-              <div className="progress-title">
-                <span>Postęp cyklu</span>
-                <strong>{progress}%</strong>
+            <div className="progress-card legend-card">
+              <div className="legend-header">
+                <span>Legenda</span>
+                <strong>{visibleTasks.length} tasków</strong>
               </div>
 
-              <div className="progress-bar">
-                <div style={{ width: `${progress}%` }}></div>
-              </div>
+              <div className="task-legend-list">
+                {visibleTasks.map((task, index) => {
+                  const taskProgress = taskProgressById[task.id] ?? {
+                    percent: 0,
+                    spentSeconds: 0,
+                    targetSeconds: 0,
+                  };
 
-              <small>
-                {completedTasks} z {tasks.length} zadań wykonane
-              </small>
+                  return (
+                    <button
+                      key={task.id}
+                      type="button"
+                      className={`task-legend-row ${
+                        index === activeIndex ? "active" : ""
+                      }`}
+                      onClick={() => selectTask(index)}
+                      style={{
+                        "--legend-color": getTaskColor(task, index),
+                      }}
+                    >
+                      <span className="legend-dot" aria-hidden="true"></span>
+                      <span className="legend-icon" aria-hidden="true">
+                        {task.icon}
+                      </span>
+                      <span className="legend-copy">
+                        <strong>{task.title}</strong>
+                        <small>
+                          {formatDuration(taskProgress.spentSeconds)} /{" "}
+                          {formatDuration(taskProgress.targetSeconds)}
+                        </small>
+                      </span>
+                      <span className="legend-percent">
+                        {taskProgress.percent}%
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
 
               {isAddingTask ? (
                 <form className="edit-form add-task-form" onSubmit={addTask}>

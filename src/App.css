@@ -1696,6 +1696,112 @@ button {
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
+.legend-card {
+  display: grid;
+  gap: 13px;
+}
+
+.legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.legend-header span {
+  color: #6d8199;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.legend-header strong {
+  color: #0b2440;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.task-legend-list {
+  display: grid;
+  gap: 6px;
+  max-height: 280px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.task-legend-row {
+  display: grid;
+  grid-template-columns: 10px 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  border: 0;
+  border-radius: 15px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 7px 9px;
+  text-align: left;
+}
+
+.task-legend-row:hover,
+.task-legend-row.active {
+  background: color-mix(in srgb, var(--legend-color) 14%, white);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--legend-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--legend-color) 18%, transparent);
+}
+
+.legend-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--legend-color) 18%, white);
+  font-size: 21px;
+}
+
+.legend-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.legend-copy strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #17324f;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend-copy small {
+  color: #7a8ca1;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.legend-percent {
+  min-width: 38px;
+  border-radius: 999px;
+  background: rgba(246, 248, 251, 0.9);
+  color: #31516f;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 5px 7px;
+  text-align: center;
+}
+
 .task-panel {
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.92);
@@ -1718,18 +1824,6 @@ button {
 
 .subtask-progress-button {
   padding-top: 4px;
-}
-
-.subtask-title-row span {
-  display: none;
-}
-
-.subtask-title-row strong {
-  display: none;
-}
-
-.subtask-time-row {
-  display: none;
 }
 
 .subtask-progress-bar {
@@ -1839,17 +1933,64 @@ button {
   }
 
   .panel-topline,
-  .task-panel h2,
-  .task-goal,
-  .task-goal-bar,
-  .timer-display,
   .meta,
   .description,
   .task-panel hr,
-  .subtask-header,
-  .add-subtask-button,
   .panel-actions {
     display: none;
+  }
+
+  .task-panel h2 {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 21px;
+  }
+
+  .task-goal {
+    display: flex;
+    margin-bottom: 8px;
+  }
+
+  .task-goal > strong {
+    font-size: 23px;
+  }
+
+  .task-goal-bar {
+    display: block;
+    height: 10px;
+    margin-bottom: 14px;
+  }
+
+  .timer-display {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin-bottom: 16px;
+  }
+
+  .timer-section:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .timer-value {
+    font-size: 34px;
+  }
+
+  .timer-value-small {
+    font-size: 22px;
+  }
+
+  .subtask-header {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .add-subtask-button {
+    display: block;
+    margin-bottom: 10px;
   }
 
   .subtask-list {

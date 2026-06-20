@@ -1,49 +1,5 @@
 import { formatDuration } from "../utils/sessionTracker";
-
-const segmentColors = [
-  "#20bdbd",
-  "#7fd2ff",
-  "#2f8df0",
-  "#246fd7",
-  "#ffd74d",
-  "#56cfc5",
-  "#18afa9",
-  "#8ad8ff",
-];
-
-const taskColorByKeyword = [
-  { keywords: ["nauka", "czytanie", "mianowania"], color: "#7fd2ff" },
-  { keywords: ["sprzątanie", "porządek"], color: "#56cfc5" },
-  { keywords: ["drums", "muzyka", "werbel"], color: "#246fd7" },
-  { keywords: ["trening", "ćwiczenia", "rozgrzewka"], color: "#2f8df0" },
-  { keywords: ["praca", "projekt"], color: "#20bdbd" },
-  { keywords: ["lunch", "kawa", "posiłek"], color: "#ffd74d" },
-  { keywords: ["relaks", "spacer", "uważność"], color: "#8ad8ff" },
-];
-
-const taskColorByIcon = {
-  "📚": "#7fd2ff",
-  "🧹": "#56cfc5",
-  "🥁": "#246fd7",
-  "🏃": "#2f8df0",
-  "💻": "#20bdbd",
-  "🍴": "#ffd74d",
-  "📖": "#7fd2ff",
-  "🌿": "#8ad8ff",
-};
-
-const getTaskColor = (task, index) => {
-  if (taskColorByIcon[task.icon]) {
-    return taskColorByIcon[task.icon];
-  }
-
-  const title = task.title.toLocaleLowerCase("pl-PL");
-  const matched = taskColorByKeyword.find(({ keywords }) =>
-    keywords.some((keyword) => title.includes(keyword))
-  );
-
-  return matched?.color ?? segmentColors[index % segmentColors.length];
-};
+import { getTaskColor } from "../utils/taskColors";
 
 const polarToCartesian = (angle, radius) => {
   const angleInRadians = (angle * Math.PI) / 180;
