@@ -4,6 +4,7 @@ function TaskPanel({
   task,
   finishTask,
   toggleSubtask,
+  activateSubtask,
   showSubWheel,
   setShowSubWheel,
   sessionStartTime,
@@ -11,6 +12,8 @@ function TaskPanel({
   dailyTotalSaved,
   dailyTotalSavedForTask,
   taskProgress,
+  activeSubtaskId,
+  subtaskProgressById = {},
 }) {
   const completedSubtasks = task.subtasks.filter((subtask) => subtask.done).length;
   const elapsedTimeForDisplay = sessionStartTime ? elapsedTime : 0;
@@ -73,19 +76,53 @@ function TaskPanel({
 
       {task.subtasks.length > 0 ? (
         <ul className="subtask-list">
-          {task.subtasks.map((subtask) => (
-            <li key={subtask.id}>
-              <button
-                className={subtask.done ? "checked" : ""}
-                onClick={() => toggleSubtask(subtask.id)}
+          {task.subtasks.map((subtask) => {
+            const progress = subtaskProgressById[subtask.id] ?? {
+              spentSeconds: 0,
+              targetSeconds: 0,
+              percent: 0,
+            };
+
+            return (
+              <li
+                key={subtask.id}
+                className={activeSubtaskId === subtask.id ? "active-subtask" : ""}
               >
-                {subtask.done ? "✓" : ""}
-              </button>
-              <span className={subtask.done ? "done-text" : ""}>
-                {subtask.title}
-              </span>
-            </li>
-          ))}
+                <button
+                  type="button"
+                  className={subtask.done ? "checked" : ""}
+                  onClick={() => toggleSubtask(subtask.id)}
+                  aria-label={
+                    subtask.done
+                      ? `Oznacz "${subtask.title}" jako niewykonane`
+                      : `Oznacz "${subtask.title}" jako wykonane`
+                  }
+                >
+                  {subtask.done ? "✓" : ""}
+                </button>
+
+                <button
+                  type="button"
+                  className="subtask-progress-button"
+                  onClick={() => activateSubtask(subtask.id)}
+                >
+                  <span className="subtask-title-row">
+                    <span className={subtask.done ? "done-text" : ""}>
+                      {subtask.title}
+                    </span>
+                    <strong>{progress.percent}%</strong>
+                  </span>
+                  <span className="subtask-time-row">
+                    {formatDuration(progress.spentSeconds)} /{" "}
+                    {formatDuration(progress.targetSeconds)}
+                  </span>
+                  <span className="subtask-progress-bar">
+                    <span style={{ width: `${progress.percent}%` }}></span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <p className="empty">To zadanie nie ma podzadań.</p>

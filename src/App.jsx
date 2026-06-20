@@ -16,6 +16,7 @@ import {
   endSession,
   addSessionToTask,
   getDailyDuration,
+  getDailySubtaskDuration,
   getTargetSeconds,
   getTimeProgressPercent,
 } from "./utils/sessionTracker";
@@ -40,7 +41,18 @@ function App() {
       : false;
 
     const resolvedRunningSession = isStoredSessionValid
-      ? storedRunningSession
+      ? {
+          ...storedRunningSession,
+          subtaskId:
+            storedRunningSession.subtaskId &&
+            initialTasksState
+              .find((task) => task.id === storedRunningSession.taskId)
+              ?.subtasks.some(
+                (subtask) => subtask.id === storedRunningSession.subtaskId
+              )
+              ? storedRunningSession.subtaskId
+              : null,
+        }
       : null;
 
     const resolvedActiveIndex = resolvedRunningSession
@@ -56,6 +68,7 @@ function App() {
       resolvedRunningSession || (defaultTask && !defaultTask.done
         ? {
             taskId: defaultTask.id,
+            subtaskId: null,
             startTime: createSession(new Date()).startTime,
           }
         : null);
@@ -121,7 +134,10 @@ function App() {
         return prevTasks;
       }
 
-      const startedSession = createSession(new Date(runningSession.startTime));
+      const startedSession = createSession(
+        new Date(runningSession.startTime),
+        runningSession.subtaskId ?? null
+      );
       const completedSession = endSession(startedSession, endedAt);
 
       return prevTasks.map((task, index) =>
@@ -133,10 +149,11 @@ function App() {
     clearRunningSession();
   };
 
-  const startRunningSessionForTask = (taskId, startedAt) => {
-    const startedSession = createSession(startedAt);
+  const startRunningSessionForTask = (taskId, startedAt, subtaskId = null) => {
+    const startedSession = createSession(startedAt, subtaskId);
     const nextRunningSession = {
       taskId,
+      subtaskId,
       startTime: startedSession.startTime,
     };
 
@@ -171,6 +188,28 @@ function App() {
   const taskProgressById = Object.fromEntries(
     tasks.map((task) => [task.id, getTaskProgress(task)])
   );
+  const subtaskProgressById = activeTask
+    ? Object.fromEntries(
+        activeTask.subtasks.map((subtask) => {
+          const spentSeconds =
+            getDailySubtaskDuration(activeTask, subtask.id, today) +
+            (runningSession?.taskId === activeTask.id &&
+            runningSession?.subtaskId === subtask.id
+              ? runningSessionElapsed
+              : 0);
+          const targetSeconds = getTargetSeconds(subtask);
+
+          return [
+            subtask.id,
+            {
+              spentSeconds,
+              targetSeconds,
+              percent: getTimeProgressPercent(spentSeconds, targetSeconds),
+            },
+          ];
+        })
+      )
+    : {};
 
   const totalTargetSeconds = tasks.reduce(
     (sum, task) => sum + getTargetSeconds(task),
@@ -212,6 +251,27 @@ function App() {
       startRunningSessionForTask(nextTask.id, now);
     }
   };
+
+  function activateSubtask(subtaskId) {
+    if (!activeTask) {
+      return;
+    }
+
+    const nextSubtaskId =
+      runningSession?.taskId === activeTask.id &&
+      runningSession?.subtaskId === subtaskId
+        ? null
+        : subtaskId;
+    const now = new Date();
+
+    if (runningSession) {
+      stopRunningSession(now);
+    }
+
+    if (!activeTask.done) {
+      startRunningSessionForTask(activeTask.id, now, nextSubtaskId);
+    }
+  }
 
   function finishTask() {
     if (!activeTask) {
@@ -331,6 +391,7 @@ function App() {
               task={activeTask}
               finishTask={finishTask}
               toggleSubtask={toggleSubtask}
+              activateSubtask={activateSubtask}
               showSubWheel={showSubWheel}
               setShowSubWheel={setShowSubWheel}
               sessionStartTime={sessionStartTime}
@@ -342,6 +403,12 @@ function App() {
               dailyTotalSaved={dailyTotalSaved}
               dailyTotalSavedForTask={dailyTotalSavedForTask}
               taskProgress={taskProgressById[activeTask.id]}
+              activeSubtaskId={
+                runningSession?.taskId === activeTask.id
+                  ? runningSession.subtaskId
+                  : null
+              }
+              subtaskProgressById={subtaskProgressById}
             />
           ) : (
             <aside className="task-panel">

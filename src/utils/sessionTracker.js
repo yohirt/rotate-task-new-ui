@@ -42,12 +42,13 @@ export const getTimeProgressPercent = (spentSeconds, targetSeconds) => {
  * @param {Date} startTime - czas rozpoczęcia
  * @returns {object} obiekt sesji
  */
-export const createSession = (startTime) => {
+export const createSession = (startTime, subtaskId = null) => {
   return {
     startTime: startTime.toISOString(),
     endTime: null,
     duration: 0,
     durationSeconds: 0,
+    subtaskId,
     date: getLocalDateKey(startTime), // YYYY-MM-DD (lokalna data)
   };
 };
@@ -97,6 +98,24 @@ export const getDailyDuration = (task, date) => {
   
   return task.sessions
     .filter((session) => session.date === date)
+    .reduce((total, session) => {
+      if (typeof session.durationSeconds === "number") {
+        return total + session.durationSeconds;
+      }
+
+      if (typeof session.duration === "number") {
+        return total + session.duration * 60;
+      }
+
+      return total;
+    }, 0);
+};
+
+export const getDailySubtaskDuration = (task, subtaskId, date) => {
+  if (!task.sessions || task.sessions.length === 0) return 0;
+
+  return task.sessions
+    .filter((session) => session.date === date && session.subtaskId === subtaskId)
     .reduce((total, session) => {
       if (typeof session.durationSeconds === "number") {
         return total + session.durationSeconds;

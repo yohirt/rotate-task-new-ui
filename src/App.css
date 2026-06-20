@@ -462,11 +462,20 @@ button {
 
 .subtask-list li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 12px;
 }
 
-.subtask-list button {
+.subtask-list li.active-subtask {
+  background: #eef2ff;
+  border-color: #635bff;
+}
+
+.subtask-list > li > button:first-child {
+  flex: 0 0 auto;
   width: 25px;
   height: 25px;
   border-radius: 50%;
@@ -474,11 +483,62 @@ button {
   background: white;
   color: white;
   cursor: pointer;
+  margin-top: 2px;
 }
 
-.subtask-list button.checked {
+.subtask-list > li > button:first-child.checked {
   background: #37c982;
   border-color: #37c982;
+}
+
+.subtask-progress-button {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.subtask-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #1f2937;
+  font-size: 15px;
+}
+
+.subtask-title-row strong {
+  color: #4338ca;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.subtask-time-row {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.subtask-progress-bar {
+  display: block;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.subtask-progress-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #2dd4bf, #635bff);
+  border-radius: inherit;
+  transition: width 0.4s ease;
 }
 
 .done-text {
