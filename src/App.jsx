@@ -4,6 +4,7 @@ import StatsPanel from "./components/StatsPanel";
 import TaskWheel from "./components/TaskWheel";
 import SubtaskWheel from "./components/SubtaskWheel";
 import { initialTasks } from "./data/initialTasks";
+import { ICON_OPTIONS } from "./data/taskIcons";
 import { getTaskColor } from "./utils/taskColors";
 import {
   loadTasks,
@@ -835,6 +836,22 @@ function App() {
     setNewTaskForm((currentForm) => ({ ...currentForm, [field]: value }));
   }
 
+  const renderNewTaskIconPicker = () => (
+    <div className="icon-picker" aria-label="Szybki wybor ikony">
+      {ICON_OPTIONS.map((icon) => (
+        <button
+          key={icon}
+          type="button"
+          className={newTaskForm.icon === icon ? "selected" : ""}
+          onClick={() => updateNewTaskFormField("icon", icon)}
+          aria-label={`Uzyj ikony ${icon}`}
+        >
+          {icon}
+        </button>
+      ))}
+    </div>
+  );
+
   function addTask(event) {
     event.preventDefault();
 
@@ -1172,6 +1189,8 @@ function App() {
                     </label>
                   </div>
 
+                  {renderNewTaskIconPicker()}
+
                   <label>
                     <span>Opis</span>
                     <textarea
@@ -1296,6 +1315,7 @@ function App() {
                       />
                     </label>
                   </div>
+                  {renderNewTaskIconPicker()}
                   <div className="edit-actions">
                     <button
                       type="button"

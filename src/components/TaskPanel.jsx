@@ -1,22 +1,6 @@
 import { useState } from "react";
+import { ICON_OPTIONS } from "../data/taskIcons";
 import { formatDuration } from "../utils/sessionTracker";
-
-const ICON_OPTIONS = [
-  "\u{1F4DA}",
-  "\u{1F9F9}",
-  "\u{1F941}",
-  "\u{1F3C3}",
-  "\u{1F4BB}",
-  "\u{1F374}",
-  "\u{1F4D6}",
-  "\u{1F33F}",
-  "\u{1F9E0}",
-  "\u{1F3AF}",
-  "\u{1F6E0}\uFE0F",
-  "\u{1F9D8}",
-  "\u{1F4DD}",
-  "\u2728",
-];
 
 const getTaskFormState = (task) => ({
   title: task.title,
