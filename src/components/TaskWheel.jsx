@@ -145,10 +145,8 @@ function TaskWheel({
           <rect className="wheel-handle" x="47.8" y="0.4" width="4.4" height="4.4" rx="1.2" />
         </svg>
 
-      </div>
-
-      {tasks.map((task, index) => {
-          const angle = index * angleStep - activeIndex * angleStep;
+        {tasks.map((task, index) => {
+          const angle = index * angleStep;
           const iconPosition = polarToCartesian(angle, iconOrbitRadius);
           const progress = taskProgressById[task.id] ?? {
             percent: 0,
@@ -168,8 +166,9 @@ function TaskWheel({
             title={`${task.title} - ${progress.percent}%`}
             style={{
               left: `${iconPosition.x}%`,
-              top: `calc(${iconPosition.y}% + ${ICON_VERTICAL_OFFSET_PX}px)`,
-              transform: "translate(-50%, -50%)",
+              top: `${iconPosition.y}%`,
+              transform: `translate(-50%, -50%) rotate(${activeIndex * angleStep}deg)`,
+              "--icon-y-offset": `${ICON_VERTICAL_OFFSET_PX}px`,
               "--task-progress": `${progress.percent}%`,
               "--item-color": taskColors[index],
               zIndex: index === activeIndex ? 30 : 20,
@@ -189,6 +188,7 @@ function TaskWheel({
           </button>
           );
         })}
+      </div>
 
       <div className="wheel-center">
         <span className="center-progress" aria-hidden="true"></span>

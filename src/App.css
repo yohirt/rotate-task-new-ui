@@ -1723,6 +1723,7 @@ button {
     0 1px 0 rgba(255, 255, 255, 0.5);
   font-size: 34px;
   text-shadow: 0 2px 4px rgba(15, 36, 64, 0.18);
+  transform: translateY(var(--icon-y-offset, 0));
 }
 
 .wheel-item.active .task-icon {
