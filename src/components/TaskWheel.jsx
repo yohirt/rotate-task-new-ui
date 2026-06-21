@@ -70,7 +70,7 @@ const getIconOrbitRadius = (taskCount) => {
   return clamp(annularCentroidRadius + outwardBalance, minimumRadius, maximumRadius);
 };
 
-const ICON_VERTICAL_OFFSET = -3;
+const ICON_VERTICAL_OFFSET_PX = 10;
 
 function TaskWheel({
   tasks,
@@ -145,8 +145,10 @@ function TaskWheel({
           <rect className="wheel-handle" x="47.8" y="0.4" width="4.4" height="4.4" rx="1.2" />
         </svg>
 
-        {tasks.map((task, index) => {
-          const angle = index * angleStep;
+      </div>
+
+      {tasks.map((task, index) => {
+          const angle = index * angleStep - activeIndex * angleStep;
           const iconPosition = polarToCartesian(angle, iconOrbitRadius);
           const progress = taskProgressById[task.id] ?? {
             percent: 0,
@@ -165,9 +167,9 @@ function TaskWheel({
             )} z ${formatDuration(progress.targetSeconds)}`}
             title={`${task.title} - ${progress.percent}%`}
             style={{
-              left: `calc(${iconPosition.x}% + 4px)`,
-              top: `calc(${iconPosition.y + ICON_VERTICAL_OFFSET}% + 1px)`,
-              transform: `translate(-50%, -50%) rotate(${activeIndex * angleStep}deg)`,
+              left: `${iconPosition.x}%`,
+              top: `calc(${iconPosition.y}% + ${ICON_VERTICAL_OFFSET_PX}px)`,
+              transform: "translate(-50%, -50%)",
               "--task-progress": `${progress.percent}%`,
               "--item-color": taskColors[index],
               zIndex: index === activeIndex ? 30 : 20,
@@ -187,7 +189,6 @@ function TaskWheel({
           </button>
           );
         })}
-      </div>
 
       <div className="wheel-center">
         <span className="center-progress" aria-hidden="true"></span>
