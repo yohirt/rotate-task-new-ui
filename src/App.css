@@ -922,6 +922,11 @@ button {
   margin-top: 7px;
 }
 
+.subtask-progress-bar span {
+  display: block;
+  min-width: 0;
+}
+
 .done-text {
   color: var(--green);
 }
