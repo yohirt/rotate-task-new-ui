@@ -25,6 +25,7 @@ import {
   formatDuration,
 } from "./utils/sessionTracker";
 import "./App.css";
+import "./App.dark.css";
 
 const getLocalDateKey = (date) => {
   const year = date.getFullYear();
@@ -41,6 +42,7 @@ const formatHeaderDate = (date) =>
   });
 
 const INSTALL_PROMPT_READY_EVENT = "rotate:install-prompt-ready";
+const THEME_STORAGE_KEY = "rotate.theme.v1";
 let pendingInstallPrompt = null;
 
 if (typeof window !== "undefined") {
@@ -173,6 +175,20 @@ function App() {
     bootstrap.initialSessionStartTime
   );
   const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === "undefined") {
+      return "light";
+    }
+
+    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+    if (storedTheme === "dark" || storedTheme === "light") {
+      return storedTheme;
+    }
+
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  });
 
   const getAudioContext = useCallback(() => {
     if (typeof window === "undefined") {
@@ -237,6 +253,11 @@ function App() {
   useEffect(() => {
     saveTasks(tasks);
   }, [tasks]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }, [theme]);
 
   useEffect(() => {
     if (runningSession) {
@@ -1013,6 +1034,23 @@ function App() {
           <button type="button">
             <span className="nav-icon" aria-hidden="true">🕘</span>
             <span className="nav-label">Historia</span>
+          </button>
+          <button
+            type="button"
+            className="theme-toggle-nav"
+            aria-pressed={theme === "dark"}
+            onClick={() =>
+              setTheme((currentTheme) =>
+                currentTheme === "dark" ? "light" : "dark"
+              )
+            }
+          >
+            <span className="nav-icon" aria-hidden="true">
+              {theme === "dark" ? "\u2600\uFE0F" : "\u{1F319}"}
+            </span>
+            <span className="nav-label">
+              {theme === "dark" ? "Jasny" : "Ciemny"}
+            </span>
           </button>
           <button type="button">
             <span className="nav-icon" aria-hidden="true">⚙️</span>

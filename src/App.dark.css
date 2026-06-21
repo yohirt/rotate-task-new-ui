@@ -1,0 +1,270 @@
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --pastel-pink: #ff9ecb;
+  --pastel-mint: #86f4d8;
+  --pastel-lilac: #bba7ff;
+  --pastel-peach: #ffd0a6;
+  --ink: #ecf4ff;
+  --muted: #99aac0;
+  --line: rgba(127, 151, 180, 0.34);
+  --paper: rgba(18, 29, 43, 0.86);
+  --paper-solid: #121d2b;
+  --blue: #68a7ff;
+  --blue-dark: #b8d7ff;
+  --sky: #54c8ff;
+  --teal: #2ed5c9;
+  --green: #5ee28d;
+  --yellow: #ffd84d;
+  --danger: #ff6b7a;
+  --shadow: 0 28px 80px rgba(0, 0, 0, 0.36);
+  --soft-shadow: 0 16px 42px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] body {
+  background:
+    linear-gradient(120deg, rgba(255, 158, 203, 0.08), transparent 32%),
+    linear-gradient(240deg, rgba(134, 244, 216, 0.09), transparent 38%),
+    radial-gradient(circle at 88% 16%, rgba(187, 167, 255, 0.12), transparent 25rem),
+    linear-gradient(135deg, #07111d 0%, #0d1724 52%, #101827 100%);
+  color: var(--ink);
+}
+
+html[data-theme="dark"] #root {
+  border-color: rgba(127, 151, 180, 0.22);
+}
+
+html[data-theme="dark"] body::before {
+  background: rgba(46, 213, 201, 0.08);
+}
+
+html[data-theme="dark"] body::after {
+  background: rgba(104, 167, 255, 0.1);
+}
+
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .top-menu,
+html[data-theme="dark"] .wheel-area,
+html[data-theme="dark"] .task-panel,
+html[data-theme="dark"] .stats-section,
+html[data-theme="dark"] .subtask-section,
+html[data-theme="dark"] .progress-card {
+  border-color: rgba(127, 151, 180, 0.28);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.01)),
+    rgba(15, 25, 38, 0.78);
+  box-shadow: var(--shadow);
+}
+
+html[data-theme="dark"] .topbar {
+  background:
+    linear-gradient(110deg, rgba(255, 158, 203, 0.1), transparent 35%),
+    linear-gradient(260deg, rgba(134, 244, 216, 0.12), transparent 42%),
+    rgba(15, 25, 38, 0.84);
+}
+
+html[data-theme="dark"] .top-menu {
+  background:
+    linear-gradient(90deg, rgba(187, 167, 255, 0.1), rgba(134, 244, 216, 0.08)),
+    rgba(15, 25, 38, 0.88);
+}
+
+html[data-theme="dark"] .topbar-actions span,
+html[data-theme="dark"] .topbar-actions button,
+html[data-theme="dark"] .meta span,
+html[data-theme="dark"] .timer-section,
+html[data-theme="dark"] .stat-box,
+html[data-theme="dark"] .stats-task-row,
+html[data-theme="dark"] .hidden-task-list button {
+  border-color: rgba(127, 151, 180, 0.26);
+  background: rgba(18, 31, 47, 0.74);
+  color: #d6e6f7;
+}
+
+html[data-theme="dark"] .logo,
+html[data-theme="dark"] .cycle-title strong,
+html[data-theme="dark"] .task-panel h2,
+html[data-theme="dark"] .legend-header strong,
+html[data-theme="dark"] .legend-copy strong,
+html[data-theme="dark"] .task-goal strong,
+html[data-theme="dark"] .stats-header h2,
+html[data-theme="dark"] .stat-box strong,
+html[data-theme="dark"] .stats-task-title {
+  color: #f4f8ff;
+}
+
+html[data-theme="dark"] .cycle-title,
+html[data-theme="dark"] .description,
+html[data-theme="dark"] .legend-copy small,
+html[data-theme="dark"] .timer-label,
+html[data-theme="dark"] .subtask-time-row,
+html[data-theme="dark"] .empty {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .top-menu button {
+  color: #a9bad0;
+}
+
+html[data-theme="dark"] .top-menu button.active,
+html[data-theme="dark"] .top-menu button:hover,
+html[data-theme="dark"] .top-menu .theme-toggle-nav[aria-pressed="true"] {
+  background:
+    linear-gradient(135deg, rgba(134, 244, 216, 0.18), rgba(187, 167, 255, 0.13));
+  color: #dffdf9;
+  box-shadow: inset 0 0 0 1px rgba(134, 244, 216, 0.28);
+}
+
+html[data-theme="dark"] .wheel-area {
+  background:
+    linear-gradient(150deg, rgba(255, 158, 203, 0.08), transparent 34%),
+    linear-gradient(220deg, rgba(134, 244, 216, 0.1), transparent 36%),
+    linear-gradient(180deg, rgba(18, 31, 47, 0.9), rgba(10, 19, 31, 0.88));
+}
+
+html[data-theme="dark"] .wheel-segments {
+  filter: drop-shadow(0 24px 28px rgba(0, 0, 0, 0.34));
+}
+
+html[data-theme="dark"] .wheel-segments path {
+  stroke: rgba(10, 19, 31, 0.95);
+}
+
+html[data-theme="dark"] .wheel-outer-rim,
+html[data-theme="dark"] .wheel-inner-rim {
+  fill: #101b2a;
+  stroke: rgba(127, 151, 180, 0.32);
+}
+
+html[data-theme="dark"] .wheel-center::before {
+  background:
+    radial-gradient(circle at center, #111e2d 0 48%, transparent 49%),
+    conic-gradient(var(--pastel-mint) 0deg 92deg, transparent 92deg 180deg, var(--pastel-lilac) 180deg 262deg, transparent 262deg 360deg);
+  box-shadow:
+    inset 0 0 0 14px #111e2d,
+    0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] .center-progress {
+  background:
+    repeating-conic-gradient(from -90deg, rgba(178, 199, 222, 0.72) 0deg 2deg, transparent 2deg 10deg);
+}
+
+html[data-theme="dark"] .center-time {
+  color: #7f95ad;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.34),
+    0.35px 0 currentColor,
+    -0.35px 0 currentColor;
+}
+
+html[data-theme="dark"] .center-time.running {
+  color: var(--teal);
+}
+
+html[data-theme="dark"] .center-label,
+html[data-theme="dark"] .task-goal span,
+html[data-theme="dark"] .edit-form label span,
+html[data-theme="dark"] .legend-header span,
+html[data-theme="dark"] .stats-header span,
+html[data-theme="dark"] .stat-box span {
+  color: #8fa4bc;
+}
+
+html[data-theme="dark"] .task-icon,
+html[data-theme="dark"] .panel-icon,
+html[data-theme="dark"] .legend-icon {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(134, 244, 216, 0.07)),
+    rgba(21, 34, 51, 0.82);
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.26),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"] .task-legend-row:hover,
+html[data-theme="dark"] .task-legend-row.active {
+  background: color-mix(in srgb, var(--legend-color) 26%, #101b2a);
+}
+
+html[data-theme="dark"] .legend-percent,
+html[data-theme="dark"] .task-percent {
+  background: rgba(18, 31, 47, 0.86);
+  color: #cfe4ff;
+}
+
+html[data-theme="dark"] .task-goal-bar,
+html[data-theme="dark"] .progress-bar,
+html[data-theme="dark"] .stats-task-bar,
+html[data-theme="dark"] .subtask-progress-bar {
+  background: rgba(73, 91, 113, 0.46);
+}
+
+html[data-theme="dark"] .subtask-list li,
+html[data-theme="dark"] .subtask-list li.active-subtask {
+  border-color: rgba(127, 151, 180, 0.18);
+  background: transparent;
+}
+
+html[data-theme="dark"] .subtask-title-row {
+  color: #eaf3ff;
+}
+
+html[data-theme="dark"] .subtask-edit-button,
+html[data-theme="dark"] .subtask-delete-button,
+html[data-theme="dark"] .icon-button {
+  border-color: rgba(127, 151, 180, 0.22);
+  background: rgba(18, 31, 47, 0.86);
+  color: #b9cce2;
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.26);
+}
+
+html[data-theme="dark"] .edit-form input,
+html[data-theme="dark"] .edit-form textarea {
+  border-color: rgba(127, 151, 180, 0.3);
+  background: rgba(10, 19, 31, 0.82);
+  color: #f4f8ff;
+}
+
+html[data-theme="dark"] .secondary,
+html[data-theme="dark"] .add-task-button,
+html[data-theme="dark"] .add-subtask-button {
+  background:
+    linear-gradient(135deg, rgba(134, 244, 216, 0.14), rgba(187, 167, 255, 0.08));
+  color: #dffdf9;
+}
+
+html[data-theme="dark"] .reset-all-button {
+  border-color: rgba(255, 216, 77, 0.44);
+  background: rgba(255, 216, 77, 0.12);
+  color: #ffe99a;
+}
+
+html[data-theme="dark"] .danger {
+  background: rgba(255, 107, 122, 0.12);
+  color: #ffb4be;
+}
+
+@media (max-width: 760px) {
+  html[data-theme="dark"] body {
+    background:
+      linear-gradient(155deg, rgba(255, 158, 203, 0.08), transparent 34%),
+      linear-gradient(225deg, rgba(134, 244, 216, 0.1), transparent 42%),
+      #08121f;
+  }
+
+  html[data-theme="dark"] .top-menu {
+    background:
+      linear-gradient(105deg, rgba(255, 158, 203, 0.1), rgba(134, 244, 216, 0.1)),
+      rgba(12, 22, 35, 0.94);
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.4);
+  }
+
+  html[data-theme="dark"] .top-menu .theme-toggle-nav {
+    background: rgba(134, 244, 216, 0.1);
+  }
+
+  html[data-theme="dark"] .top-menu .theme-toggle-nav .nav-icon {
+    filter: none;
+    opacity: 1;
+  }
+}
