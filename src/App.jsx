@@ -71,6 +71,16 @@ const createTaskFromForm = (form, nextId) => ({
   sessions: [],
 });
 
+const resetTaskForDate = (task, dateKey) => ({
+  ...task,
+  done: false,
+  subtasks: (task.subtasks || []).map((subtask) => ({
+    ...subtask,
+    done: false,
+  })),
+  sessions: (task.sessions || []).filter((session) => session.date !== dateKey),
+});
+
 function App() {
   const [installPrompt, setInstallPrompt] = useState(() => pendingInstallPrompt);
   const [installNotice, setInstallNotice] = useState("");
@@ -548,6 +558,51 @@ function App() {
     });
   }
 
+  function resetTaskToday(taskId) {
+    const taskToReset = tasks.find((task) => task.id === taskId);
+    if (!taskToReset) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Zresetowac dzisiejszy progres taska "${taskToReset.title}"?`
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    if (runningSession?.taskId === taskId) {
+      setRunningSession(null);
+      clearRunningSession();
+      setSessionStartTime(null);
+    }
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? resetTaskForDate(task, today) : task
+      )
+    );
+  }
+
+  function resetAllTasksToday() {
+    const confirmed = window.confirm(
+      "Zresetowac dzisiejszy progres wszystkich taskow?"
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    if (runningSession) {
+      setRunningSession(null);
+      clearRunningSession();
+      setSessionStartTime(null);
+    }
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => resetTaskForDate(task, today))
+    );
+  }
+
   function toggleSubtask(subtaskId) {
     if (!activeTask) {
       return;
@@ -839,6 +894,15 @@ function App() {
                 <strong>{visibleTasks.length} tasków</strong>
               </div>
 
+              <button
+                type="button"
+                className="reset-all-button"
+                onClick={resetAllTasksToday}
+                disabled={visibleTasks.length === 0}
+              >
+                Resetuj wszystkie dzisiaj
+              </button>
+
               <div className="task-legend-list">
                 {visibleTasks.map((task, index) => {
                   const taskProgress = taskProgressById[task.id] ?? {
@@ -974,6 +1038,7 @@ function App() {
                 key={activeTask.id}
                 task={activeTask}
                 finishTask={finishTask}
+                resetTaskToday={resetTaskToday}
                 hideTask={hideTask}
                 deleteTask={deleteTask}
                 addSubtask={addSubtask}

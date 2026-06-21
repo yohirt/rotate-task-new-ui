@@ -38,6 +38,7 @@ const emptySubtaskForm = {
 function TaskPanel({
   task,
   finishTask,
+  resetTaskToday,
   hideTask,
   deleteTask,
   addSubtask,
@@ -439,6 +440,10 @@ function TaskPanel({
 
         <button className="primary" onClick={finishTask}>
           {"\u2713"} Zatrzymaj zadanie
+        </button>
+
+        <button className="secondary" onClick={() => resetTaskToday(task.id)}>
+          Resetuj dzisiaj
         </button>
 
         <button className="danger" onClick={() => deleteTask(task.id)}>

@@ -581,7 +581,8 @@ button {
 }
 
 .add-task-button,
-.add-subtask-button {
+.add-subtask-button,
+.reset-all-button {
   width: 100%;
   min-height: 42px;
   border: 1px dashed rgba(35, 196, 186, 0.62);
@@ -592,14 +593,33 @@ button {
   font-weight: 900;
 }
 
-.add-task-button {
+.add-task-button,
+.reset-all-button {
   margin-top: 14px;
 }
 
 .add-task-button:hover,
-.add-subtask-button:hover {
+.add-subtask-button:hover,
+.reset-all-button:hover {
   background: #effbff;
   border-color: var(--blue);
+}
+
+.reset-all-button {
+  border-style: solid;
+  border-color: rgba(255, 211, 77, 0.8);
+  background: #fff9df;
+  color: #765b00;
+}
+
+.reset-all-button:hover {
+  background: #fff4bd;
+  border-color: var(--yellow);
+}
+
+.reset-all-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
 }
 
 .hidden-task-list {
