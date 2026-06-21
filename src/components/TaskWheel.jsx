@@ -70,7 +70,7 @@ const getIconOrbitRadius = (taskCount) => {
   return clamp(annularCentroidRadius + outwardBalance, minimumRadius, maximumRadius);
 };
 
-const ICON_VERTICAL_OFFSET = -3;
+const ICON_VERTICAL_OFFSET = 0;
 
 function TaskWheel({
   tasks,
@@ -165,8 +165,8 @@ function TaskWheel({
             )} z ${formatDuration(progress.targetSeconds)}`}
             title={`${task.title} - ${progress.percent}%`}
             style={{
-              left: `calc(${iconPosition.x}% + 4px)`,
-              top: `calc(${iconPosition.y + ICON_VERTICAL_OFFSET}% + 1px)`,
+              left: `${iconPosition.x}%`,
+              top: `${iconPosition.y + ICON_VERTICAL_OFFSET}%`,
               transform: `translate(-50%, -50%) rotate(${activeIndex * angleStep}deg)`,
               "--task-progress": `${progress.percent}%`,
               "--item-color": taskColors[index],
