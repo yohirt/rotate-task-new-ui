@@ -209,13 +209,13 @@ function TaskPanel({
           <div className="timer-value-small">
             {formatDuration(dailyTotalSavedForTask + elapsedTimeForDisplay)}
           </div>
-          <div className="timer-label">Ten task dzisiaj</div>
+          <div className="timer-label">Ten task w cyklu</div>
         </div>
         <div className="timer-section">
           <div className="timer-value-small">
             {formatDuration(dailyTotalSaved + elapsedTimeForDisplay)}
           </div>
-          <div className="timer-label">Dzisiaj razem</div>
+          <div className="timer-label">Cykl razem</div>
         </div>
       </div>
 
@@ -427,7 +427,7 @@ function TaskPanel({
         </button>
 
         <button className="secondary" onClick={() => resetTaskToday(task.id)}>
-          Resetuj dzisiaj
+          Resetuj w cyklu
         </button>
 
         <button className="danger" onClick={() => deleteTask(task.id)}>

@@ -14,7 +14,7 @@ function StatsPanel({
       <div className="stats-header">
         <div>
           <span>Statystyki</span>
-          <h2>Dzisiaj</h2>
+          <h2>Bieżący cykl</h2>
         </div>
         <strong>{stats.progressPercent}%</strong>
       </div>

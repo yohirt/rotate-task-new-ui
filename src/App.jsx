@@ -18,22 +18,12 @@ import {
   createSession,
   endSession,
   addSessionToTask,
-  getDailyDuration,
-  getDailySessions,
-  getDailySubtaskDuration,
   getTargetSeconds,
   getTimeProgressPercent,
   formatDuration,
 } from "./utils/sessionTracker";
 import "./App.css";
 import "./App.dark.css";
-
-const getLocalDateKey = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
 
 const formatHeaderDate = (date) =>
   date.toLocaleDateString("pl-PL", {
@@ -51,6 +41,7 @@ const formatHeaderTime = (date) =>
 const INSTALL_PROMPT_READY_EVENT = "rotate:install-prompt-ready";
 const THEME_STORAGE_KEY = "rotate.theme.v1";
 const UI_STATE_STORAGE_KEY = "rotate.ui-state.v1";
+const CYCLE_START_STORAGE_KEY = "rotate.cycle-start.v1";
 let pendingInstallPrompt = null;
 
 if (typeof window !== "undefined") {
@@ -81,15 +72,28 @@ const createTaskFromForm = (form, nextId) => ({
   sessions: [],
 });
 
-const resetTaskForDate = (task, dateKey) => ({
+const resetTaskForCycle = (task, resetAt) => ({
   ...task,
   done: false,
+  cycleResetAt: resetAt.toISOString(),
   subtasks: (task.subtasks || []).map((subtask) => ({
     ...subtask,
     done: false,
   })),
-  sessions: (task.sessions || []).filter((session) => session.date !== dateKey),
 });
+
+const resetTaskCycleMarker = (task) => {
+  const { cycleResetAt, ...taskWithoutCycleReset } = task;
+
+  return {
+    ...taskWithoutCycleReset,
+    done: false,
+    subtasks: (task.subtasks || []).map((subtask) => ({
+      ...subtask,
+      done: false,
+    })),
+  };
+};
 
 const TASK_SOUND_ALERTS = [
   { thresholdSeconds: 5 * 60, beepCount: 5 },
@@ -129,6 +133,117 @@ const saveUiState = (uiState) => {
     })
   );
 };
+
+const getStartOfLocalDay = (date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+const loadCycleStartTime = () => {
+  if (typeof window === "undefined") {
+    return getStartOfLocalDay(new Date());
+  }
+
+  try {
+    const storedCycleStart = window.localStorage.getItem(CYCLE_START_STORAGE_KEY);
+    if (storedCycleStart) {
+      const parsedDate = new Date(storedCycleStart);
+      if (!Number.isNaN(parsedDate.getTime())) {
+        return parsedDate;
+      }
+    }
+  } catch {
+    // Fall through to initializing the current cycle.
+  }
+
+  const initialCycleStart = getStartOfLocalDay(new Date());
+  window.localStorage.setItem(
+    CYCLE_START_STORAGE_KEY,
+    initialCycleStart.toISOString()
+  );
+  return initialCycleStart;
+};
+
+const saveCycleStartTime = (cycleStartTime) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(
+    CYCLE_START_STORAGE_KEY,
+    cycleStartTime.toISOString()
+  );
+};
+
+const getSessionStartTime = (session) => {
+  if (session?.startTime) {
+    const parsedStart = new Date(session.startTime);
+    if (!Number.isNaN(parsedStart.getTime())) {
+      return parsedStart;
+    }
+  }
+
+  if (session?.date) {
+    const parsedDate = new Date(`${session.date}T00:00:00`);
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return parsedDate;
+    }
+  }
+
+  return null;
+};
+
+const isSessionInCycle = (session, cycleStartTime) => {
+  const sessionStartTime = getSessionStartTime(session);
+  return (
+    sessionStartTime !== null &&
+    sessionStartTime.getTime() >= cycleStartTime.getTime()
+  );
+};
+
+const getTaskCycleStartTime = (task, cycleStartTime) => {
+  if (!task?.cycleResetAt) {
+    return cycleStartTime;
+  }
+
+  const taskResetAt = new Date(task.cycleResetAt);
+  if (Number.isNaN(taskResetAt.getTime())) {
+    return cycleStartTime;
+  }
+
+  return taskResetAt.getTime() > cycleStartTime.getTime()
+    ? taskResetAt
+    : cycleStartTime;
+};
+
+const getCycleDuration = (task, cycleStartTime, subtaskId = undefined) => {
+  const taskCycleStartTime = getTaskCycleStartTime(task, cycleStartTime);
+
+  return (task.sessions || [])
+    .filter((session) => {
+      const matchesSubtask =
+        subtaskId === undefined ? true : session.subtaskId === subtaskId;
+      return matchesSubtask && isSessionInCycle(session, taskCycleStartTime);
+    })
+    .reduce((total, session) => {
+      if (typeof session.durationSeconds === "number") {
+        return total + session.durationSeconds;
+      }
+
+      if (typeof session.duration === "number") {
+        return total + session.duration * 60;
+      }
+
+      return total;
+    }, 0);
+};
+
+const getCycleSessions = (tasks, cycleStartTime) =>
+  tasks.flatMap((task) => {
+    const taskCycleStartTime = getTaskCycleStartTime(task, cycleStartTime);
+
+    return (task.sessions || []).filter((session) =>
+      isSessionInCycle(session, taskCycleStartTime)
+    );
+  });
 
 function App() {
   const audioContextRef = useRef(null);
@@ -225,6 +340,7 @@ function App() {
     bootstrap.initialSessionStartTime
   );
   const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [cycleStartTime, setCycleStartTime] = useState(loadCycleStartTime);
   const [theme, setTheme] = useState(() => {
     if (typeof window === "undefined") {
       return "light";
@@ -308,6 +424,10 @@ function App() {
     document.documentElement.dataset.theme = theme;
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
+
+  useEffect(() => {
+    saveCycleStartTime(cycleStartTime);
+  }, [cycleStartTime]);
 
   useEffect(() => {
     if (runningSession) {
@@ -501,21 +621,35 @@ function App() {
     };
   }, [activeTask?.id, activeView, showSubWheel]);
 
-  // Łączny czas zapisanych sesji z całego dnia (wszystkie taski)
-  const today = getLocalDateKey(new Date());
+  // Łączny czas zapisanych sesji w bieżącym cyklu.
   const headerDate = formatHeaderDate(currentTime);
   const headerTime = formatHeaderTime(currentTime);
-  const runningSessionElapsed = runningSession
-    ? calculateElapsedSeconds(runningSession.startTime, currentTime)
-    : 0;
+  const getRunningSessionElapsedInCycle = (task, subtaskId = undefined) => {
+    if (!runningSession || runningSession.taskId !== task.id) {
+      return 0;
+    }
 
-  const getTaskSpentToday = (task) =>
-    getDailyDuration(task, today) +
-    (runningSession?.taskId === task.id ? runningSessionElapsed : 0);
+    if (subtaskId !== undefined && runningSession.subtaskId !== subtaskId) {
+      return 0;
+    }
+
+    const runningStartedAt = new Date(runningSession.startTime);
+    const taskCycleStartTime = getTaskCycleStartTime(task, cycleStartTime);
+    const effectiveStartTime =
+      runningStartedAt.getTime() > taskCycleStartTime.getTime()
+        ? runningStartedAt
+        : taskCycleStartTime;
+
+    return calculateElapsedSeconds(effectiveStartTime, currentTime);
+  };
+
+  const getTaskSpentInCycle = (task) =>
+    getCycleDuration(task, cycleStartTime) +
+    getRunningSessionElapsedInCycle(task);
 
   const getTaskProgress = (task) => {
     const targetSeconds = getTargetSeconds(task);
-    const spentSeconds = getTaskSpentToday(task);
+    const spentSeconds = getTaskSpentInCycle(task);
 
     return {
       spentSeconds,
@@ -535,11 +669,8 @@ function App() {
     ? Object.fromEntries(
         activeTask.subtasks.map((subtask) => {
           const spentSeconds =
-            getDailySubtaskDuration(activeTask, subtask.id, today) +
-            (runningSession?.taskId === activeTask.id &&
-            runningSession?.subtaskId === subtask.id
-              ? runningSessionElapsed
-              : 0);
+            getCycleDuration(activeTask, cycleStartTime, subtask.id) +
+            getRunningSessionElapsedInCycle(activeTask, subtask.id);
           const targetSeconds = getTargetSeconds(subtask);
 
           return [
@@ -642,25 +773,26 @@ function App() {
       ...taskProgressById[task.id],
     }))
     .sort((a, b) => b.spentSeconds - a.spentSeconds);
-  const todaySessionCount =
-    getDailySessions(visibleTasks, today).length + (runningSession ? 1 : 0);
+  const cycleSessionCount =
+    getCycleSessions(visibleTasks, cycleStartTime).length +
+    (runningSession ? 1 : 0);
   const stats = {
     spentSeconds: totalSpentSeconds,
     targetSeconds: totalTargetSeconds,
     remainingSeconds,
     overTargetSeconds,
-    sessionCount: todaySessionCount,
+    sessionCount: cycleSessionCount,
     progressPercent:
       totalTargetSeconds > 0
         ? getTimeProgressPercent(totalProgressSeconds, totalTargetSeconds)
         : 0,
   };
   const dailyTotalSaved = visibleTasks.reduce(
-    (sum, task) => sum + getDailyDuration(task, today),
+    (sum, task) => sum + getCycleDuration(task, cycleStartTime),
     0
   );
   const dailyTotalSavedForTask = activeTask
-    ? getDailyDuration(activeTask, today)
+    ? getCycleDuration(activeTask, cycleStartTime)
     : 0;
 
   const selectTask = (nextIndex) => {
@@ -814,11 +946,13 @@ function App() {
     }
 
     const confirmed = window.confirm(
-      `Zresetowac dzisiejszy progres taska "${taskToReset.title}"?`
+      `Zresetowac progres taska "${taskToReset.title}" w biezacym cyklu?`
     );
     if (!confirmed) {
       return;
     }
+
+    const resetAt = new Date();
 
     if (runningSession?.taskId === taskId) {
       setRunningSession(null);
@@ -828,18 +962,20 @@ function App() {
 
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task.id === taskId ? resetTaskForDate(task, today) : task
+        task.id === taskId ? resetTaskForCycle(task, resetAt) : task
       )
     );
   }
 
   function resetAllTasksToday() {
     const confirmed = window.confirm(
-      "Zresetowac dzisiejszy progres wszystkich taskow?"
+      "Zresetowac progres calego cyklu?"
     );
     if (!confirmed) {
       return;
     }
+
+    const resetAt = new Date();
 
     if (runningSession) {
       setRunningSession(null);
@@ -847,8 +983,9 @@ function App() {
       setSessionStartTime(null);
     }
 
+    setCycleStartTime(resetAt);
     setTasks((prevTasks) =>
-      prevTasks.map((task) => resetTaskForDate(task, today))
+      prevTasks.map((task) => resetTaskCycleMarker(task))
     );
   }
 
@@ -1197,7 +1334,7 @@ function App() {
                 onClick={resetAllTasksToday}
                 disabled={visibleTasks.length === 0}
               >
-                Resetuj wszystkie dzisiaj
+                Resetuj cały cykl
               </button>
 
               <div className="task-legend-list">
@@ -1350,9 +1487,7 @@ function App() {
                 setShowSubWheel={setShowSubWheel}
                 sessionStartTime={sessionStartTime}
                 elapsedTime={
-                  runningSession?.taskId === activeTask.id
-                    ? runningSessionElapsed
-                    : 0
+                  getRunningSessionElapsedInCycle(activeTask)
                 }
                 dailyTotalSaved={dailyTotalSaved}
                 dailyTotalSavedForTask={dailyTotalSavedForTask}

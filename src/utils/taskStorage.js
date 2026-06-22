@@ -12,12 +12,10 @@ function getTasksDefinitionSignature(tasks) {
       time: task.time,
       targetMinutes: task.targetMinutes,
       description: task.description,
-      done: task.done,
       subtasks: (task.subtasks || []).map((subtask) => ({
         id: subtask.id,
         title: subtask.title,
         targetMinutes: subtask.targetMinutes,
-        done: subtask.done,
       })),
     }))
   );
@@ -30,21 +28,22 @@ export function loadTasks(fallbackTasks) {
       TASKS_DEFINITION_SIGNATURE_STORAGE_KEY
     );
     const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
+    const parsedTasks = storedTasks ? JSON.parse(storedTasks) : null;
+    const hasStoredTasks = Array.isArray(parsedTasks);
 
     if (storedSignature !== fallbackSignature) {
       localStorage.setItem(
         TASKS_DEFINITION_SIGNATURE_STORAGE_KEY,
         fallbackSignature
       );
+      return hasStoredTasks ? parsedTasks : fallbackTasks;
+    }
+
+    if (!hasStoredTasks) {
       return fallbackTasks;
     }
 
-    if (!storedTasks) {
-      return fallbackTasks;
-    }
-
-    const parsedTasks = JSON.parse(storedTasks);
-    return Array.isArray(parsedTasks) ? parsedTasks : fallbackTasks;
+    return parsedTasks;
   } catch {
     return fallbackTasks;
   }
