@@ -5,6 +5,11 @@ import TaskWheel from "./components/TaskWheel";
 import SubtaskWheel from "./components/SubtaskWheel";
 import { initialTasks } from "./data/initialTasks";
 import { ICON_OPTIONS } from "./data/taskIcons";
+import {
+  TASK_COMPLETION_SOUND,
+  TASK_SOUND_ALERTS,
+  TASK_SWITCH_SOUND,
+} from "./data/taskSounds";
 import { getTaskColor } from "./utils/taskColors";
 import {
   loadTasks,
@@ -94,13 +99,6 @@ const resetTaskCycleMarker = (task) => {
     })),
   };
 };
-
-const TASK_SOUND_ALERTS = [
-  { thresholdSeconds: 5 * 60, beepCount: 5 },
-  { thresholdSeconds: 3 * 60, beepCount: 3 },
-  { thresholdSeconds: 2 * 60, beepCount: 2 },
-  { thresholdSeconds: 60, beepCount: 1 },
-];
 
 const loadUiState = () => {
   if (typeof window === "undefined") {
@@ -401,20 +399,19 @@ function App() {
     oscillator.stop(endTime + 0.02);
   }, [getAudioContext]);
 
-  const playBeeps = useCallback((count) => {
-    Array.from({ length: count }).forEach((_, index) => {
-      playTone(index * 0.22, 0.11, 920);
+  const playSoundPattern = useCallback((soundPattern) => {
+    soundPattern.forEach(({ startOffset = 0, duration = 0.14, frequency }) => {
+      playTone(startOffset, duration, frequency);
     });
   }, [playTone]);
 
   const playCompletionSound = useCallback(() => {
-    playTone(0, 0.75, 620);
-    playTone(0.08, 0.65, 930);
-  }, [playTone]);
+    playSoundPattern(TASK_COMPLETION_SOUND);
+  }, [playSoundPattern]);
 
   const playTaskSwitchSound = useCallback(() => {
-    playTone(0, 0.08, 760);
-  }, [playTone]);
+    playSoundPattern(TASK_SWITCH_SOUND);
+  }, [playSoundPattern]);
 
   useEffect(() => {
     saveTasks(tasks);
@@ -713,7 +710,7 @@ function App() {
       return;
     }
 
-    TASK_SOUND_ALERTS.forEach(({ thresholdSeconds, beepCount }) => {
+    TASK_SOUND_ALERTS.forEach(({ thresholdSeconds, sound }) => {
       const soundKey = `${sessionKey}:${thresholdSeconds}`;
       if (
         previousRemainingSeconds > thresholdSeconds &&
@@ -721,7 +718,7 @@ function App() {
         !playedSoundKeysRef.current.has(soundKey)
       ) {
         playedSoundKeysRef.current.add(soundKey);
-        playBeeps(beepCount);
+        playSoundPattern(sound);
       }
     });
 
@@ -740,8 +737,8 @@ function App() {
     activeTask,
     activeTaskProgress,
     activeTaskRemainingSeconds,
-    playBeeps,
     playCompletionSound,
+    playSoundPattern,
     runningSession,
   ]);
 
