@@ -1831,7 +1831,7 @@ button {
   border: 0;
   background: transparent;
   box-shadow: none;
-  contain: layout paint style;
+  contain: layout style;
   transform: translateZ(0);
 }
 
@@ -1892,6 +1892,66 @@ button {
   backface-visibility: hidden;
   transform-origin: center;
   will-change: transform;
+}
+
+.wheel-corner-fillers {
+  position: absolute;
+  inset: -2%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.wheel-corner-filler {
+  position: absolute;
+  width: 31%;
+  height: 31%;
+  background:
+    radial-gradient(circle at 68% 68%, rgba(255, 255, 255, 0.9), transparent 38%),
+    linear-gradient(145deg, rgba(106, 231, 217, 0.72), rgba(141, 205, 255, 0.62));
+  filter:
+    drop-shadow(0 14px 18px rgba(31, 73, 125, 0.16))
+    drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  opacity: 0.96;
+}
+
+.wheel-corner-filler::after {
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.18);
+  content: "";
+}
+
+.wheel-corner-filler.top-left {
+  top: 1%;
+  left: 1%;
+  border-radius: 34px 18px 18px;
+  -webkit-mask: radial-gradient(circle at 170% 171%, transparent 0 74%, #000 74.8%);
+  mask: radial-gradient(circle at 170% 171%, transparent 0 74%, #000 74.8%);
+}
+
+.wheel-corner-filler.top-right {
+  top: 1%;
+  right: 1%;
+  border-radius: 18px 34px 18px 18px;
+  -webkit-mask: radial-gradient(circle at -70% 171%, transparent 0 74%, #000 74.8%);
+  mask: radial-gradient(circle at -70% 171%, transparent 0 74%, #000 74.8%);
+}
+
+.wheel-corner-filler.bottom-left {
+  bottom: 1%;
+  left: 1%;
+  border-radius: 18px 18px 18px 34px;
+  -webkit-mask: radial-gradient(circle at 170% -71%, transparent 0 74%, #000 74.8%);
+  mask: radial-gradient(circle at 170% -71%, transparent 0 74%, #000 74.8%);
+}
+
+.wheel-corner-filler.bottom-right {
+  right: 1%;
+  bottom: 1%;
+  border-radius: 18px 18px 34px 18px;
+  -webkit-mask: radial-gradient(circle at -70% -71%, transparent 0 74%, #000 74.8%);
+  mask: radial-gradient(circle at -70% -71%, transparent 0 74%, #000 74.8%);
 }
 
 .wheel-item {
@@ -2390,6 +2450,12 @@ button {
 
   .task-wheel {
     width: min(100vw - 18px, 410px);
+  }
+
+  .wheel-corner-filler {
+    width: 29%;
+    height: 29%;
+    opacity: 0.9;
   }
 
   .mobile-cycle-plan {

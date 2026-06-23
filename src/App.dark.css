@@ -155,6 +155,13 @@ html[data-theme="dark"] .app-footer-actions .pwa-refresh-button {
   color: #a9f4ee;
 }
 
+html[data-theme="dark"] .wheel-corner-filler {
+  background:
+    radial-gradient(circle at 68% 68%, rgba(134, 244, 216, 0.24), transparent 38%),
+    linear-gradient(145deg, rgba(46, 213, 201, 0.34), rgba(104, 167, 255, 0.24));
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.28));
+}
+
 html[data-theme="dark"] .wheel-segments {
   filter: drop-shadow(0 24px 28px rgba(0, 0, 0, 0.34));
 }

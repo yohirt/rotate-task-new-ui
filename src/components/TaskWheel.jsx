@@ -105,6 +105,17 @@ function TaskWheel({
         "--task-count": tasks.length,
       }}
     >
+      <div className="wheel-corner-fillers" aria-hidden="true">
+        {["top-left", "top-right", "bottom-left", "bottom-right"].map(
+          (position) => (
+            <span
+              key={position}
+              className={`wheel-corner-filler ${position}`}
+            ></span>
+          )
+        )}
+      </div>
+
       <div
         className="wheel-rotator"
         style={{
