@@ -90,8 +90,7 @@ html[data-theme="dark"] .cycle-title strong,
 html[data-theme="dark"] .active-task-summary-main strong,
 html[data-theme="dark"] .app-footer-copy strong,
 html[data-theme="dark"] .task-panel h2,
-html[data-theme="dark"] .legend-header strong,
-html[data-theme="dark"] .legend-copy strong,
+html[data-theme="dark"] .cycle-actions-header strong,
 html[data-theme="dark"] .task-goal strong,
 html[data-theme="dark"] .stats-header h2,
 html[data-theme="dark"] .stat-box strong,
@@ -105,7 +104,6 @@ html[data-theme="dark"] .active-task-summary-meta,
 html[data-theme="dark"] .bottom-hidden-task-list-header span,
 html[data-theme="dark"] .app-footer-copy span,
 html[data-theme="dark"] .description,
-html[data-theme="dark"] .legend-copy small,
 html[data-theme="dark"] .timer-label,
 html[data-theme="dark"] .subtask-time-row,
 html[data-theme="dark"] .empty {
@@ -195,14 +193,13 @@ html[data-theme="dark"] .center-time.running {
 html[data-theme="dark"] .center-label,
 html[data-theme="dark"] .task-goal span,
 html[data-theme="dark"] .edit-form label span,
-html[data-theme="dark"] .legend-header span,
+html[data-theme="dark"] .cycle-actions-header span,
 html[data-theme="dark"] .stats-header span,
 html[data-theme="dark"] .stat-box span {
   color: #8fa4bc;
 }
 
-html[data-theme="dark"] .panel-icon,
-html[data-theme="dark"] .legend-icon {
+html[data-theme="dark"] .panel-icon {
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(134, 244, 216, 0.07)),
     rgba(21, 34, 51, 0.82);
@@ -222,12 +219,6 @@ html[data-theme="dark"] .wheel-item.active .task-icon {
     0 5px 12px rgba(0, 0, 0, 0.16);
 }
 
-html[data-theme="dark"] .task-legend-row:hover,
-html[data-theme="dark"] .task-legend-row.active {
-  background: color-mix(in srgb, var(--legend-color) 26%, #101b2a);
-}
-
-html[data-theme="dark"] .legend-percent,
 html[data-theme="dark"] .task-percent {
   background: rgba(18, 31, 47, 0.86);
   color: #cfe4ff;
@@ -314,8 +305,7 @@ html[data-theme="dark"] .danger {
   }
 
   html[data-theme="dark"] .task-icon,
-  html[data-theme="dark"] .panel-icon,
-  html[data-theme="dark"] .legend-icon {
+  html[data-theme="dark"] .panel-icon {
     box-shadow:
       0 6px 12px rgba(0, 0, 0, 0.2),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05);

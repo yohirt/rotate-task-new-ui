@@ -10,7 +10,6 @@ import {
   TASK_SOUND_ALERTS,
   TASK_SWITCH_SOUND,
 } from "./data/taskSounds";
-import { getTaskColor } from "./utils/taskColors";
 import {
   loadTasks,
   saveTasks,
@@ -1388,9 +1387,9 @@ function App() {
                 pauseRunningSession={pauseRunningSession}
               />
 
-            <div className="progress-card legend-card">
-              <div className="legend-header">
-                <span>Legenda</span>
+            <div className="progress-card cycle-actions-card">
+              <div className="cycle-actions-header">
+                <span>Akcje cyklu</span>
                 <strong>{visibleTasks.length} tasków</strong>
               </div>
 
@@ -1402,45 +1401,6 @@ function App() {
               >
                 Resetuj cały cykl
               </button>
-
-              <div className="task-legend-list">
-                {visibleTasks.map((task, index) => {
-                  const taskProgress = taskProgressById[task.id] ?? {
-                    percent: 0,
-                    spentSeconds: 0,
-                    targetSeconds: 0,
-                  };
-
-                  return (
-                    <button
-                      key={task.id}
-                      type="button"
-                      className={`task-legend-row ${
-                        index === activeIndex ? "active" : ""
-                      }`}
-                      onClick={() => selectTask(index)}
-                      style={{
-                        "--legend-color": getTaskColor(task, index),
-                      }}
-                    >
-                      <span className="legend-dot" aria-hidden="true"></span>
-                      <span className="legend-icon" aria-hidden="true">
-                        {task.icon}
-                      </span>
-                      <span className="legend-copy">
-                        <strong>{task.title}</strong>
-                        <small>
-                          {formatDuration(taskProgress.spentSeconds)} /{" "}
-                          {formatDuration(taskProgress.targetSeconds)}
-                        </small>
-                      </span>
-                      <span className="legend-percent">
-                        {taskProgress.percent}%
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
 
               {isAddingTask ? (
                 <form className="edit-form add-task-form" onSubmit={addTask}>
@@ -1516,21 +1476,6 @@ function App() {
                 >
                   + Dodaj task
                 </button>
-              )}
-
-              {hiddenTasks.length > 0 && (
-                <div className="hidden-task-list">
-                  <span>Ukryte</span>
-                  {hiddenTasks.map((task) => (
-                    <button
-                      key={task.id}
-                      type="button"
-                      onClick={() => restoreTask(task.id)}
-                    >
-                      {task.icon} {task.title}
-                    </button>
-                  ))}
-                </div>
               )}
               </div>
             </div>
