@@ -28,6 +28,7 @@ function TaskPanel({
   addSubtask,
   deleteSubtask,
   updateTask,
+  adjustTaskSpentMinutes,
   updateSubtask,
   toggleSubtask,
   activateSubtask,
@@ -217,6 +218,23 @@ function TaskPanel({
           </div>
           <div className="timer-label">Cykl razem</div>
         </div>
+      </div>
+
+      <div className="time-adjust-actions" aria-label="Korekta wykonanego czasu">
+        <span>Korekta czasu</span>
+        <button
+          type="button"
+          onClick={() => adjustTaskSpentMinutes(task.id, -5)}
+          disabled={spentSeconds <= 0}
+        >
+          -5 min
+        </button>
+        <button
+          type="button"
+          onClick={() => adjustTaskSpentMinutes(task.id, 5)}
+        >
+          +5 min
+        </button>
       </div>
 
       <div className="meta">

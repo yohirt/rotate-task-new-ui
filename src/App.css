@@ -964,6 +964,45 @@ button {
   margin-bottom: 24px;
 }
 
+.time-adjust-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  margin: -10px 0 22px;
+}
+
+.time-adjust-actions span {
+  color: #6d8199;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.time-adjust-actions button {
+  min-height: 36px;
+  border: 1px solid rgba(202, 221, 239, 0.9);
+  border-radius: 999px;
+  background: rgba(248, 251, 255, 0.92);
+  color: #174c62;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.time-adjust-actions button:hover {
+  border-color: rgba(35, 196, 186, 0.42);
+  background: rgba(235, 255, 252, 0.9);
+}
+
+.time-adjust-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .timer-section {
   min-width: 0;
   border: 1px solid rgba(220, 231, 243, 0.82);
@@ -2524,6 +2563,19 @@ button {
     grid-template-columns: 1fr 1fr;
     gap: 9px;
     margin-bottom: 16px;
+  }
+
+  .time-adjust-actions {
+    grid-template-columns: 1fr 1fr;
+    margin: -4px 0 16px;
+  }
+
+  .time-adjust-actions span {
+    grid-column: 1 / -1;
+  }
+
+  .time-adjust-actions button {
+    width: 100%;
   }
 
   .timer-section:first-child {

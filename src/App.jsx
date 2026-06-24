@@ -1089,6 +1089,52 @@ function App() {
     );
   }
 
+  function adjustTaskSpentMinutes(taskId, minutesDelta) {
+    const now = new Date();
+    const secondsDelta = minutesDelta * 60;
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => {
+        if (task.id !== taskId) {
+          return task;
+        }
+
+        const spentSeconds =
+          getCycleDuration(task, cycleStartTime) +
+          getRunningSessionElapsedInCycle(task);
+        const appliedSecondsDelta =
+          secondsDelta < 0
+            ? Math.max(secondsDelta, -spentSeconds)
+            : secondsDelta;
+
+        if (appliedSecondsDelta === 0) {
+          return task;
+        }
+
+        const adjustmentSession = createSession(
+          now,
+          runningSession?.taskId === task.id
+            ? runningSession.subtaskId ?? null
+            : null
+        );
+
+        return {
+          ...task,
+          sessions: [
+            ...(task.sessions || []),
+            {
+              ...adjustmentSession,
+              endTime: now.toISOString(),
+              duration: Math.round(appliedSecondsDelta / 60),
+              durationSeconds: appliedSecondsDelta,
+              manualAdjustment: true,
+            },
+          ],
+        };
+      })
+    );
+  }
+
   function updateSubtask(taskId, subtaskId, updates) {
     setTasks((prevTasks) =>
       prevTasks.map((task) => {
@@ -1516,6 +1562,7 @@ function App() {
                 addSubtask={addSubtask}
                 deleteSubtask={deleteSubtask}
                 updateTask={updateTask}
+                adjustTaskSpentMinutes={adjustTaskSpentMinutes}
                 updateSubtask={updateSubtask}
                 toggleSubtask={toggleSubtask}
                 activateSubtask={activateSubtask}
