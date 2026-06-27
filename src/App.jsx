@@ -1425,7 +1425,6 @@ function App() {
           <div className="topbar-actions">
             <span>📅 {headerDate} · {headerTime}</span>
             <AuthPanel />
-            <span>📅 Środa, 22 maja</span>
             <button>🔔</button>
             <button>⋮</button>
           </div>
