@@ -92,7 +92,8 @@ const resetTaskForCycle = (task, resetAt) => ({
 });
 
 const resetTaskCycleMarker = (task) => {
-  const { cycleResetAt, ...taskWithoutCycleReset } = task;
+  const taskWithoutCycleReset = { ...task };
+  delete taskWithoutCycleReset.cycleResetAt;
 
   return {
     ...taskWithoutCycleReset,
